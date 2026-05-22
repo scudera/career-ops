@@ -53,6 +53,60 @@ function resolveTenantSite(entry) {
   return { tenant, shard, site, endpoint, baseDisplay };
 }
 
+/**
+ * verifySlug — sanity check de tenant+site combination via single POST CXS limit=1.
+ *
+ * Cherry-picked de LeoLaborie/claude-apply (MIT) src/scan/ats/workday.mjs::verifySlug.
+ * Substitui Playwright network-capture (~3min/site) por sync HTTP (~2s) para
+ * descoberta de Workday Site ID correto.
+ *
+ * @param {string} tenantUrl - URL base do Workday (https://{tenant}.{shard}.myworkdayjobs.com/{site})
+ * @returns {Promise<{ok: boolean, count?: number, status?: number, reason?: string}>}
+ */
+export async function verifySlug(tenantUrl) {
+  if (typeof tenantUrl !== 'string') {
+    return { ok: false, reason: 'tenantUrl must be a string' };
+  }
+  const m = tenantUrl.match(WORKDAY_HOST_REGEX);
+  if (!m) {
+    return { ok: false, reason: `not a Workday URL: ${tenantUrl}` };
+  }
+  const [, tenant, shard, site] = m;
+  const endpoint = `https://${tenant}.${shard}.myworkdayjobs.com/wday/cxs/${tenant}/${site}/jobs`;
+  try {
+    assertWorkdayUrl(endpoint);
+  } catch (err) {
+    return { ok: false, reason: err.message };
+  }
+  let res;
+  try {
+    res = await globalThis.fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'User-Agent': 'career-ops-verify/1.0',
+      },
+      body: JSON.stringify({ appliedFacets: {}, limit: 1, offset: 0, searchText: '' }),
+      redirect: 'error',
+    });
+  } catch (err) {
+    return { ok: false, reason: `fetch error: ${err?.message || err}` };
+  }
+  if (!res.ok) {
+    return { ok: false, status: res.status, reason: `HTTP ${res.status}` };
+  }
+  let data;
+  try {
+    data = await res.json();
+  } catch (err) {
+    return { ok: false, reason: `json parse error: ${err?.message || err}` };
+  }
+  const postings = Array.isArray(data?.jobPostings) ? data.jobPostings : [];
+  const count = typeof data?.total === 'number' ? data.total : postings.length;
+  return { ok: true, count };
+}
+
 /** @type {Provider} */
 export default {
   id: 'workday',

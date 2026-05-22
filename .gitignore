@@ -63,5 +63,6 @@ package-lock.json
 /output/ats-answers-*.md
 /output/cv-vitor-*.pdf
 
-# Backups of this gitignore
-.gitignore.backup-*
+# Local backup files (any path, any date)
+*.backup-*
+*.bak

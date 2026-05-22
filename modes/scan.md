@@ -239,9 +239,29 @@ Los niveles son aditivos — se ejecutan en orden, los resultados se mezclan y d
    a. Añadir a `pipeline.md` sección "Pendientes": `- [ ] {url} | {company} | {title}`
    b. Registrar en `scan-history.tsv`: `{url}\t{date}\t{query_name}\t{title}\t{company}\tadded`
 
-9. **Ofertas filtradas por título**: registrar en `scan-history.tsv` con status `skipped_title`
-10. **Ofertas duplicadas**: registrar con status `skipped_dup`
-11. **Ofertas expiradas (Nivel 3)**: registrar con status `skipped_expired`
+9. **Validar URLs recién añadidas con HEAD check automático**:
+
+   Después de añadir nuevas entries a `data/pipeline.md`, ejecutar HEAD check automático en las URLs recién añadidas:
+
+   ```bash
+   node validate-pipeline.mjs [--only-new <snapshot-pre-scan>]
+   ```
+
+   El script marca URLs muertas inline como `[x] <!-- DEAD: <reason> -->` en `data/pipeline.md`. Concurrencia 8, fetch puro (sin Playwright), LinkedIn login-wall = `uncertain` (no marca dead). Solo HTTP 4xx/5xx y timeouts son marcados.
+
+   Esta validación es belt-and-suspenders sobre el liveness check del Step 7.5 (Playwright proactivo durante resultados de WebSearch): 7.5 previene URLs muertas de entrar en pipeline; este step marca aquellas que pasaron pero murieron entre scan y el próximo cycle de aplicación.
+
+   **Si `validate-pipeline.mjs` no está presente** (clone fresco sin el toolkit de liveness): saltar este step con un warning visible. No bloquear el scan.
+
+   Añadir al summary final del scan:
+
+   ```text
+   URLs bloqueadas por HEAD check: N (links muertos descartados)
+   ```
+
+10. **Ofertas filtradas por título**: registrar en `scan-history.tsv` con status `skipped_title`
+11. **Ofertas duplicadas**: registrar con status `skipped_dup`
+12. **Ofertas expiradas (Nivel 3)**: registrar con status `skipped_expired`
 
 ## Extracción de título y empresa de WebSearch results
 

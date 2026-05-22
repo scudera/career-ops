@@ -48,3 +48,20 @@ bun.lock
 .claude/memory/
 career-dashboard
 package-lock.json
+
+# Personal data — root only (added 2026-05-22)
+# Use leading slash to NOT match examples/ templates from upstream
+/cv.md
+/cv-en.md
+/cv-pt.md
+/config/profile.yml
+/config/profile.yaml
+/article-digest.md
+
+# Generated personal artifacts (any path matches output/)
+/output/cover-letter-*.md
+/output/ats-answers-*.md
+/output/cv-vitor-*.pdf
+
+# Backups of this gitignore
+.gitignore.backup-*

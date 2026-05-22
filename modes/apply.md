@@ -10,6 +10,7 @@ Interactive mode for when the candidate is filling out an application form in Ch
 ## Workflow
 
 ```text
+0. LIVENESS    → Verify URL is still active before generating anything
 1. DETECT      → Read active Chrome tab (screenshot/URL/title)
 2. IDENTIFY    → Extract company + role from the page
 3. SEARCH      → Match against existing reports in reports/
@@ -19,6 +20,36 @@ Interactive mode for when the candidate is filling out an application form in Ch
 7. GENERATE    → For each question, generate a personalized response
 8. PRESENT     → Show formatted responses for copy-paste
 ```
+
+## Step 0 — Pre-flight liveness check (MANDATORY)
+
+Before generating ANY artifact (cover letter, ATS answers, tailored PDF), verify that the target URL still hosts an active posting. Stale postings expire silently in 4–8 weeks; generating bundles against dead URLs is pure token waste and risks "phantom application" confusion in the tracker.
+
+### 0.1 — Acquire the URL
+
+Get the canonical URL from the report file (`reports/NNN-*.md`, field `**URL:**` or `**Apply link:**`).
+
+### 0.2 — Run pre-apply-check.mjs
+
+Execute from project root:
+
+```bash
+node pre-apply-check.mjs <url> [--job-num NNN]
+```
+
+The script returns JSON on stdout and a human-readable message on stderr. Capture both.
+
+### 0.3 — Handle exit codes
+
+- **Exit 0 (active):** Apply control detected on the page. Proceed to Step 1.
+- **Exit 1 (expired):** URL returns HTTP 4xx/5xx, page lacks job content, or explicit "no longer available" indicator. ABORT bundle generation. Mark the report's tracker row as `status: dead` in `data/applications.md`. Suggest re-scan to find an equivalent fresh posting.
+- **Exit 2 (uncertain):** LinkedIn login-wall, anti-bot challenge, or ambiguous signals. Manually verify in a private/incognito tab before deciding. Do not auto-proceed.
+
+### 0.4 — Fallback if script absent
+
+If `pre-apply-check.mjs` is not present in the project root (e.g., a fresh clone without the liveness toolkit), prompt the user to either install it or perform a manual liveness check (open URL in incognito, verify Apply button is visible, scan body for dead-posting indicators). Do not silently skip — record the manual check result alongside the bundle metadata so the audit trail stays honest.
+
+---
 
 ## Step 1 — Detect the job
 

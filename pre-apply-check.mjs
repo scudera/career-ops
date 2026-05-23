@@ -21,7 +21,7 @@
 
 import { chromium } from 'playwright';
 import { classifyLiveness } from './liveness-core.mjs';
-import { classifyFromHtml, waitForStableDOM } from './classify-work-mode.mjs';
+import { classifyWithConsensus, waitForStableDOM } from './classify-work-mode.mjs';
 
 async function checkUrl(page, url) {
   try {
@@ -73,20 +73,21 @@ async function checkUrl(page, url) {
 
     const liveness = classifyLiveness({ status, finalUrl, bodyText, applyControls });
 
-    // Always enrich when liveness is ACTIVE — page is already loaded, so the
-    // classification is free. Caller (career-ops apply mode, manual review)
-    // decides whether to surface the v2 fields. Old callers ignore `enriched`
-    // (backward-compat: pure additive JSON key).
+    // Enrich when liveness is ACTIVE via consensus voting (CP3.5 Fase A):
+    // 3 independent classification runs of the same URL, majority-tier wins.
+    // Latency budget ~3x single classification (~12-15s total for pre-apply) —
+    // acceptable per CP3.5 spec ("pre-apply é momento crítico"). Backward
+    // compat: `enriched` is a pure additive JSON field.
     if (liveness.result === 'active') {
       try {
-        const html = await page.content();
-        const cls = classifyFromHtml(html, bodyText);
+        const cls = await classifyWithConsensus(page, url);
         liveness.enriched = {
           work_mode: cls.work_mode,
           br_eligible: cls.br_eligible,
           tier: cls.tier,
           location_real: cls.location_real,
           evidence: cls.evidence,
+          consensus: cls.consensus,
         };
       } catch (err) {
         liveness.enriched = { error: err.message.split('\n')[0].slice(0, 120) };
@@ -147,7 +148,8 @@ async function main() {
   if (result === 'active') {
     process.stderr.write('✅ Vaga ativa — prosseguir com geração do pacote\n');
     if (enriched && !enriched.error) {
-      process.stderr.write(`   work_mode=${enriched.work_mode} br_eligible=${enriched.br_eligible} tier=${enriched.tier} location_real="${enriched.location_real}"\n`);
+      const conf = enriched.consensus ? ` consensus=${enriched.consensus.confidence}` : '';
+      process.stderr.write(`   work_mode=${enriched.work_mode} br_eligible=${enriched.br_eligible} tier=${enriched.tier} location_real="${enriched.location_real}"${conf}\n`);
     }
   } else if (result === 'expired') {
     process.stderr.write(`❌ Vaga expirada — abortar geração. Motivo: ${reason}\n`);

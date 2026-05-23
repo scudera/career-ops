@@ -323,6 +323,29 @@ export function brEligibleFromStructuredLocation(loc, work_mode) {
  * @param {{minStableMs?: number, maxWaitMs?: number, pollMs?: number}} [opts]
  * @returns {Promise<{stable: boolean, waitedMs: number, finalLen: number}>}
  */
+/**
+ * URL signatures of Phenom-based career sites. Used by the CP3.5 Fase B
+ * defensive rule (Phenom Brazil placeholder fallback). Stable as of 2026-05.
+ */
+const PHENOM_URL_PATTERNS = [
+  /jobs\.iqvia\.com\//i,
+  /careers\.iconplc\.com\//i,
+  /careers\.abbvie\.com\//i,
+  /jobs\.parexel\.com\//i,
+  /jobs\.thermofisher\.com\//i,
+  /careers\.amgen\.com\//i,
+  /careers\.chiesi\.com\//i,
+];
+
+/**
+ * @param {string} url
+ * @returns {boolean}
+ */
+export function isPhenomURL(url) {
+  if (typeof url !== 'string') return false;
+  return PHENOM_URL_PATTERNS.some((re) => re.test(url));
+}
+
 export async function waitForStableDOM(page, opts = {}) {
   const {
     minStableMs = 500,
@@ -346,4 +369,83 @@ export async function waitForStableDOM(page, opts = {}) {
     await page.waitForTimeout(pollMs);
   }
   return { stable: false, waitedMs: maxWaitMs, finalLen: lastLen };
+}
+
+/**
+ * Consensus voting across N independent classification runs of the same URL.
+ * Each run is a full `page.goto + waitForStableDOM + classifyFromHtml` cycle —
+ * CP3.5 resolves non-determinism exposed in CP3 (IQVIA R1519241 oscillating
+ * HYBRID/Tier 2 ↔ REMOTE/Tier 1 across runs).
+ *
+ * Tier consensus rules:
+ *   - 2+ runs concordam (majority on 3, or unanimous on N=runs)   → use that tier
+ *   - Split (todos diferentes / nenhum atinge majority)            → conservative fallback = worst tier (Math.max)
+ *
+ * `work_mode` / `br_eligible` herda do PRIMEIRO run com tier-consenso.
+ * (Tier number é o consenso, mas o (work_mode, br_eligible) underlying pode
+ * variar entre runs do mesmo tier — caller deve tratar tier como mais
+ * autoritativo do que os labels.)
+ *
+ * @param {import('playwright').Page} page
+ * @param {string} url
+ * @param {{runs?: number, delayBetweenMs?: number, navTimeoutMs?: number}} [opts]
+ * @returns {Promise<Classification & {consensus: {confidence: 'unanimous'|'majority'|'split-fallback-conservative', runs: number, tierDistribution: Record<number, number>, allRuns: Array<{tier: number, work_mode: WorkMode, br_eligible: BrEligible, evidence: string}>}}>}
+ */
+export async function classifyWithConsensus(page, url, opts = {}) {
+  const { runs = 3, delayBetweenMs = 500, navTimeoutMs = 45000 } = opts;
+  /** @type {Array<Classification>} */
+  const results = [];
+  for (let i = 0; i < runs; i++) {
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: navTimeoutMs });
+    await waitForStableDOM(page);
+    const html = await page.content();
+    const bodyText = await page.evaluate(() => document.body?.innerText || '');
+    results.push(classifyFromHtml(html, bodyText));
+    if (i < runs - 1) await page.waitForTimeout(delayBetweenMs);
+  }
+
+  /** @type {Record<number, number>} */
+  const tierDistribution = {};
+  for (const r of results) tierDistribution[r.tier] = (tierDistribution[r.tier] || 0) + 1;
+  const sortedTiers = Object.entries(tierDistribution).sort((a, b) => b[1] - a[1]);
+  const topTier = parseInt(sortedTiers[0][0], 10);
+  const topCount = sortedTiers[0][1];
+
+  let consensusTier;
+  /** @type {'unanimous'|'majority'|'split-fallback-conservative'} */
+  let confidence;
+  if (topCount === runs) {
+    consensusTier = topTier;
+    confidence = 'unanimous';
+  } else if (topCount >= 2) {
+    consensusTier = topTier;
+    confidence = 'majority';
+  } else {
+    consensusTier = Math.max(...results.map((r) => r.tier));
+    confidence = 'split-fallback-conservative';
+  }
+
+  const winningRun = results.find((r) => r.tier === consensusTier) || results[0];
+  process.stderr.write(
+    `[consensus] url=${url.slice(0, 90)} runs=${runs} winner=Tier-${consensusTier} confidence=${confidence} dist=${JSON.stringify(tierDistribution)}\n`
+  );
+
+  return {
+    work_mode: winningRun.work_mode,
+    br_eligible: winningRun.br_eligible,
+    tier: /** @type {1|2|3|4} */ (consensusTier),
+    location_real: winningRun.location_real,
+    evidence: winningRun.evidence,
+    consensus: {
+      confidence,
+      runs: results.length,
+      tierDistribution,
+      allRuns: results.map((r) => ({
+        tier: r.tier,
+        work_mode: r.work_mode,
+        br_eligible: r.br_eligible,
+        evidence: r.evidence,
+      })),
+    },
+  };
 }

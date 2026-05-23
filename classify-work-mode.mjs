@@ -74,9 +74,9 @@ export function stripHtmlComments(raw) {
 /**
  * Lenient JSON parse fallback for legacy site formats. Strict parse should
  * always be attempted first; this only runs when strict fails. Handles:
- *   - Trailing commas before } or ]:   `{"a": 1,}` → `{"a": 1}`
- *   - JS-style block comments inline:  `{"a": 1 /* x */}` → `{"a": 1 }`
- *   - JS-style line comments inline:   `{"a": 1 // x\n}` → `{"a": 1 \n}`
+ *   - Trailing commas before } or ]
+ *   - JS-style block comments inline (slash-star ... star-slash)
+ *   - JS-style line comments inline  (double-slash to end of line)
  *
  * Single-quote keys/strings are intentionally NOT auto-converted — too risky
  * without a full tokenizer (would corrupt apostrophes inside legitimate

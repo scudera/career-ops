@@ -1,0 +1,77 @@
+{
+  "_meta": {
+    "purpose": "JSON-LD robustness test fixtures for COTSK-9 (STEAL 6).",
+    "shape": "Each case is { name, description, html, expected }. `html` is a minimal HTML fragment exercising one edge case. `expected` is the JobPosting fields the parser should extract (or null if the case should fail gracefully).",
+    "casing": "title used instead of full job_posting since extractJsonLdBlocks + findJobPosting + parseJobPosting are the full pipeline under test"
+  },
+  "cases": [
+    {
+      "name": "01-strict-clean-jobposting",
+      "description": "Baseline: strict-clean JSON-LD JobPosting. Must continue to work after refactor.",
+      "html": "<html><head><script type=\"application/ld+json\">{\"@context\":\"https://schema.org\",\"@type\":\"JobPosting\",\"title\":\"Regulatory Affairs Manager\",\"jobLocationType\":\"TELECOMMUTE\"}</script></head></html>",
+      "expected": {
+        "found": true,
+        "title": "Regulatory Affairs Manager",
+        "locationType": "TELECOMMUTE"
+      }
+    },
+    {
+      "name": "02-html-comment-wrap",
+      "description": "Trick 1: JSON-LD wrapped in <!-- ... --> inside the script tag.",
+      "html": "<html><head><script type=\"application/ld+json\">\n<!--\n{\"@context\":\"https://schema.org\",\"@type\":\"JobPosting\",\"title\":\"Comment Wrapped Role\",\"jobLocationType\":\"ON_SITE\"}\n-->\n</script></head></html>",
+      "expected": {
+        "found": true,
+        "title": "Comment Wrapped Role",
+        "locationType": "ON_SITE"
+      }
+    },
+    {
+      "name": "03-graph-array-jobposting",
+      "description": "Trick 2: JobPosting nested under @graph array alongside WebPage.",
+      "html": "<html><head><script type=\"application/ld+json\">{\"@context\":\"https://schema.org\",\"@graph\":[{\"@type\":\"WebPage\",\"name\":\"Careers\"},{\"@type\":\"JobPosting\",\"title\":\"Inside Graph Role\",\"jobLocationType\":\"TELECOMMUTE\"}]}</script></head></html>",
+      "expected": {
+        "found": true,
+        "title": "Inside Graph Role",
+        "locationType": "TELECOMMUTE"
+      }
+    },
+    {
+      "name": "04-top-level-array",
+      "description": "Trick 2 edge: top-level array of nodes (no @graph wrapper). Schema.org allows this.",
+      "html": "<html><head><script type=\"application/ld+json\">[{\"@type\":\"BreadcrumbList\",\"itemListElement\":[]},{\"@type\":\"JobPosting\",\"title\":\"Top Array Role\",\"employmentType\":\"FULL_TIME\"}]</script></head></html>",
+      "expected": {
+        "found": true,
+        "title": "Top Array Role",
+        "employmentType": "FULL_TIME"
+      }
+    },
+    {
+      "name": "05-trailing-commas",
+      "description": "Trick 3: JSON with trailing commas before } and ]. Strict JSON.parse rejects; lenient should recover.",
+      "html": "<html><head><script type=\"application/ld+json\">{\"@type\":\"JobPosting\",\"title\":\"Trailing Comma Role\",\"jobLocationType\":\"REMOTE\",}</script></head></html>",
+      "expected": {
+        "found": true,
+        "title": "Trailing Comma Role",
+        "locationType": "REMOTE"
+      }
+    },
+    {
+      "name": "06-inline-block-comment",
+      "description": "Trick 3: JSON with inline /* */ comment. Strict JSON.parse rejects; lenient should recover.",
+      "html": "<html><head><script type=\"application/ld+json\">{\"@type\":\"JobPosting\",\"title\":\"Block Comment Role\" /* injected by build tool */, \"jobLocationType\":\"HYBRID\"}</script></head></html>",
+      "expected": {
+        "found": true,
+        "title": "Block Comment Role",
+        "locationType": "HYBRID"
+      }
+    },
+    {
+      "name": "07-unrecoverable-malformed",
+      "description": "Trick 3 floor: garbage that neither strict nor lenient can parse. Must fail gracefully (return null) and log a WARN — not throw.",
+      "html": "<html><head><script type=\"application/ld+json\">{ this is not json at all :: }}}</script></head></html>",
+      "expected": {
+        "found": false
+      }
+    }
+  ]
+}

@@ -53,6 +53,25 @@ export function workModeFromEnum(raw) {
 }
 
 /**
+ * Strip a leading/trailing HTML comment pair from a JSON-LD payload. Some
+ * sites embed JSON-LD wrapped in `<!-- ... -->` inside the script tag (often
+ * a feature-flag artifact) — strict JSON.parse rejects it. Returns the inner
+ * content if the pattern matches, otherwise the trimmed original.
+ *
+ * Port of scrapinghub/extruct's jsonld comment-strip (BSD-3, MIT-compatible).
+ *
+ * @param {string} raw
+ * @returns {string}
+ */
+export function stripHtmlComments(raw) {
+  if (typeof raw !== 'string') return raw;
+  const trimmed = raw.trim();
+  const m = trimmed.match(/^<!--([\s\S]*?)-->$/);
+  if (m) return m[1].trim();
+  return trimmed;
+}
+
+/**
  * Extract all JSON-LD JobPosting blocks from HTML.
  *
  * @param {string} html
@@ -63,8 +82,9 @@ export function extractJsonLdBlocks(html) {
   const out = [];
   let m;
   while ((m = re.exec(html)) !== null) {
+    const payload = stripHtmlComments(m[1]);
     try {
-      const parsed = JSON.parse(m[1].trim());
+      const parsed = JSON.parse(payload);
       if (Array.isArray(parsed)) out.push(...parsed);
       else out.push(parsed);
     } catch {

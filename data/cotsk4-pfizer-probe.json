@@ -1,0 +1,1849 @@
+{
+  "total": 515,
+  "jobPostings": [
+    {
+      "title": "Sr. Director, Cloud and Infrastructure Transformation",
+      "externalPath": "/job/United-States---New-York---New-York-City/Sr-Director--Cloud-and-Infrastructure-Transformation_4956470-1",
+      "locationsText": "United States - New York - New York City",
+      "postedOn": "Posted 9 Days Ago",
+      "bulletFields": [
+        "4956470"
+      ]
+    }
+  ],
+  "facets": [
+    {
+      "facetParameter": "Location_Country",
+      "descriptor": "Location Country",
+      "values": [
+        {
+          "descriptor": "China",
+          "id": "6cb77610a8a543aea2d6bc10457e35d4",
+          "count": 177
+        },
+        {
+          "descriptor": "United States of America",
+          "id": "bc33aa3152ec42d4995f4791a106ed09",
+          "count": 132
+        },
+        {
+          "descriptor": "India",
+          "id": "c4f78be1a8f14da0ab49ce1162348a5e",
+          "count": 34
+        },
+        {
+          "descriptor": "Japan",
+          "id": "8b705da2becf43cfaccc091da0988ab2",
+          "count": 26
+        },
+        {
+          "descriptor": "Singapore",
+          "id": "80938777cac5440fab50d729f9634969",
+          "count": 25
+        },
+        {
+          "descriptor": "Greece",
+          "id": "566388c1eb974c42bd9e3da4c2f57d60",
+          "count": 19
+        },
+        {
+          "descriptor": "Croatia",
+          "id": "1face6f426c14de9979a134697da0db3",
+          "count": 11
+        },
+        {
+          "descriptor": "Vietnam",
+          "id": "db69e8c8446c11de98360015c5e6daf6",
+          "count": 10
+        },
+        {
+          "descriptor": "United Kingdom",
+          "id": "29247e57dbaf46fb855b224e03170bc7",
+          "count": 9
+        },
+        {
+          "descriptor": "Malaysia",
+          "id": "972dc4ba8d454bc0b893ff84b1529077",
+          "count": 9
+        },
+        {
+          "descriptor": "Mexico",
+          "id": "e2adff9272454660ac4fdb56fc70bb51",
+          "count": 8
+        },
+        {
+          "descriptor": "Türkiye",
+          "id": "c2e3bac5bbbb47b29dfc6e8b56a1586e",
+          "count": 7
+        },
+        {
+          "descriptor": "Canada",
+          "id": "a30a87ed25634629aa6c3958aa2b91ea",
+          "count": 7
+        },
+        {
+          "descriptor": "Philippines",
+          "id": "e56f1daf83e04bacae794ba5c5593560",
+          "count": 6
+        },
+        {
+          "descriptor": "Belgium",
+          "id": "a04ea128f43a42e59b1e6a19e8f0b374",
+          "count": 5
+        },
+        {
+          "descriptor": "Germany",
+          "id": "dcc5b7608d8644b3a93716604e78e995",
+          "count": 5
+        },
+        {
+          "descriptor": "France",
+          "id": "54c5b6971ffb4bf0b116fe7651ec789a",
+          "count": 4
+        },
+        {
+          "descriptor": "Taiwan",
+          "id": "a4e08b475d6a4176853c9d1cb9854e02",
+          "count": 4
+        },
+        {
+          "descriptor": "Colombia",
+          "id": "e8106cd6a3534f2dba6fdee2d41db89d",
+          "count": 3
+        },
+        {
+          "descriptor": "Hong Kong",
+          "id": "d4afdeb461d446e4babd204bd102dba8",
+          "count": 3
+        },
+        {
+          "descriptor": "Ireland",
+          "id": "04a05835925f45b3a59406a2a6b72c8a",
+          "count": 3
+        },
+        {
+          "descriptor": "Korea, Republic of",
+          "id": "7a5a2aadf9d34086a2bfbfd408bc28da",
+          "count": 3
+        },
+        {
+          "descriptor": "Argentina",
+          "id": "e42ad5eac46d4cc9b367ceaef42577c5",
+          "count": 2
+        },
+        {
+          "descriptor": "Chile",
+          "id": "53fe09ef12b9408682a1d2439823f2e0",
+          "count": 2
+        },
+        {
+          "descriptor": "Saudi Arabia",
+          "id": "50423b5190ad49bb89e94cd58dfaad69",
+          "count": 2
+        },
+        {
+          "descriptor": "Poland",
+          "id": "131d5ac7e3ee4d7b962bdc96e498e412",
+          "count": 2
+        },
+        {
+          "descriptor": "Bulgaria",
+          "id": "25f4875dc598484dbeee857eb2d81652",
+          "count": 2
+        },
+        {
+          "descriptor": "Thailand",
+          "id": "873d0f604e3b458c990cb4d83a5c0f14",
+          "count": 2
+        },
+        {
+          "descriptor": "Romania",
+          "id": "f2e609fe92974a55a05fc1cdc2852122",
+          "count": 2
+        },
+        {
+          "descriptor": "Pakistan",
+          "id": "567ef1bd0cc84d4e83b98d0013008264",
+          "count": 2
+        },
+        {
+          "descriptor": "Lithuania",
+          "id": "8a0328effd25491fb8e6a08801f08e94",
+          "count": 2
+        },
+        {
+          "descriptor": "Latvia",
+          "id": "1c026f3b1b8640d8bdfcb95466663e4d",
+          "count": 2
+        },
+        {
+          "descriptor": "Estonia",
+          "id": "038b0482bfea403abb61c9bcc3d7eb60",
+          "count": 2
+        },
+        {
+          "descriptor": "South Africa",
+          "id": "4db3c26940b944919b83612cc1193eed",
+          "count": 1
+        },
+        {
+          "descriptor": "Australia",
+          "id": "d903bb3fedad45039383f6de334ad4db",
+          "count": 1
+        },
+        {
+          "descriptor": "Indonesia",
+          "id": "b31234dbcdda4da9ba8fa073c5944e36",
+          "count": 1
+        },
+        {
+          "descriptor": "Costa Rica",
+          "id": "99abe7e6bb3f4c108aebebf01a369ec5",
+          "count": 1
+        },
+        {
+          "descriptor": "Sweden",
+          "id": "6a800a4736884df5826858d435650f45",
+          "count": 1
+        },
+        {
+          "descriptor": "Netherlands",
+          "id": "9696868b09c64d52a62ee13b052383cc",
+          "count": 1
+        },
+        {
+          "descriptor": "Morocco",
+          "id": "7aaca3f6fc774f16802a4df4718a5b53",
+          "count": 1
+        },
+        {
+          "descriptor": "Italy",
+          "id": "8cd04a563fd94da7b06857a79faaf815",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "facetParameter": "Location_Region_State_Province",
+      "descriptor": "Location Region/State/Province",
+      "values": [
+        {
+          "descriptor": "New York",
+          "id": "9819bf0148e54f89adb255aa7bead635",
+          "count": 71
+        },
+        {
+          "descriptor": "Shanghai",
+          "id": "12022932d53e4131959783deec185438",
+          "count": 56
+        },
+        {
+          "descriptor": "Beijing",
+          "id": "4b194fc4ae3b4cbe95a1b379454e1775",
+          "count": 45
+        },
+        {
+          "descriptor": "Massachusetts",
+          "id": "c66d738416b74fb180376cf59cc7ec8f",
+          "count": 42
+        },
+        {
+          "descriptor": "Pennsylvania",
+          "id": "f620a79f2dc44473828b42881312de2b",
+          "count": 39
+        },
+        {
+          "descriptor": "Connecticut",
+          "id": "bffb3e4c9a4a4542bc6bd075a4c26247",
+          "count": 30
+        },
+        {
+          "descriptor": "Washington",
+          "id": "de9b48948ef8421db97ddf4ea206e931",
+          "count": 27
+        },
+        {
+          "descriptor": "Tokyo",
+          "id": "6534030e79d54ac897646438ed66ac9a",
+          "count": 25
+        },
+        {
+          "descriptor": "Jiangsu",
+          "id": "8ad3cfa8b4f04b74aff60dbef3b1f9e2",
+          "count": 24
+        },
+        {
+          "descriptor": "California",
+          "id": "ec3d210e4240442e99a28fa70419aec5",
+          "count": 24
+        },
+        {
+          "descriptor": "Zhejiang",
+          "id": "10ae0aa3144f4d1e9e3cf7b723439a3c",
+          "count": 17
+        },
+        {
+          "descriptor": "Guangdong",
+          "id": "9171988616764d5ba2a87a518af470d6",
+          "count": 12
+        },
+        {
+          "descriptor": "Illinois",
+          "id": "d8bb292ed9fe44a2899a990ad569538c",
+          "count": 11
+        },
+        {
+          "descriptor": "Florida",
+          "id": "9c1a239b35bd4598856e5393b249b8a1",
+          "count": 11
+        },
+        {
+          "descriptor": "Liaoning",
+          "id": "c7d46c32f719424695cb2b0e1bfa361a",
+          "count": 10
+        },
+        {
+          "descriptor": "Hồ Chí Minh",
+          "id": "0d2948816a92477fad023c84b4fd5a6f",
+          "count": 7
+        },
+        {
+          "descriptor": "Fujian",
+          "id": "36dd74db17974762b59b8105b3c2f4db",
+          "count": 6
+        },
+        {
+          "descriptor": "Wilayah Persekutuan Kuala Lumpur",
+          "id": "d05fe10b38264230958a4167487a6d60",
+          "count": 6
+        },
+        {
+          "descriptor": "Hà Nội",
+          "id": "6f392179bfd0470db1c36b55df6c238d",
+          "count": 6
+        },
+        {
+          "descriptor": "Quebec",
+          "id": "ef8a53af14534128b795fd55d75ec08b",
+          "count": 6
+        },
+        {
+          "descriptor": "Hubei",
+          "id": "a1fa1bbcce554ad0b463b5c079ec9e2b",
+          "count": 6
+        },
+        {
+          "descriptor": "Tennessee",
+          "id": "00044a0287144032bca6973ac0eedb3e",
+          "count": 5
+        },
+        {
+          "descriptor": "Georgia",
+          "id": "dec8eabbb13d45bdb159b8e25d896110",
+          "count": 5
+        },
+        {
+          "descriptor": "Jiangxi",
+          "id": "0fdeedaedb9e495eb46b77ddbc87a3b1",
+          "count": 5
+        },
+        {
+          "descriptor": "Thessaloniki",
+          "id": "6c3c9c32227749dc9f5d571d8ce09d96",
+          "count": 4
+        },
+        {
+          "descriptor": "Texas",
+          "id": "fc77e3a1ab36487f9646d14f7242dd77",
+          "count": 4
+        },
+        {
+          "descriptor": "Taipei City",
+          "id": "c5684b475b7345d0839454b2a03c5d2d",
+          "count": 4
+        },
+        {
+          "descriptor": "New Jersey",
+          "id": "9b56fe16bdf74b2cbad8b644cdf6015a",
+          "count": 4
+        },
+        {
+          "descriptor": "North Carolina",
+          "id": "1486a0a4a8464c3b9ec482d4038deb99",
+          "count": 4
+        },
+        {
+          "descriptor": "Missouri",
+          "id": "790e3c3ddfaa4123905237a05f1df9e9",
+          "count": 4
+        },
+        {
+          "descriptor": "Henan",
+          "id": "fc5b96128faa49528371900106ed9cf7",
+          "count": 4
+        },
+        {
+          "descriptor": "Rhode Island",
+          "id": "4c2f08af9b834f13bf4c2d41679d222d",
+          "count": 3
+        },
+        {
+          "descriptor": "Oregon",
+          "id": "6fcc4198762c4a7c807486c849fe94dd",
+          "count": 3
+        },
+        {
+          "descriptor": "New Hampshire",
+          "id": "9efc91fd842142a0b0bf455e723b65a0",
+          "count": 3
+        },
+        {
+          "descriptor": "Michigan",
+          "id": "b8372eef6b5341a39cdc95ac32790cba",
+          "count": 3
+        },
+        {
+          "descriptor": "Kansas",
+          "id": "975ef5fd66c048909a4d64b64b762836",
+          "count": 3
+        },
+        {
+          "descriptor": "Idaho",
+          "id": "b1c017b8f6294b0e82773aaca1dce33e",
+          "count": 3
+        },
+        {
+          "descriptor": "Ontario",
+          "id": "218a720b28a74c67b5c6d42c00bdadfa",
+          "count": 3
+        },
+        {
+          "descriptor": "Sichuan",
+          "id": "e8d349befce64b698a7562c13a55bbd2",
+          "count": 3
+        },
+        {
+          "descriptor": "Hunan",
+          "id": "4c2fd180757b45b38cf3c54023c9ffad",
+          "count": 3
+        },
+        {
+          "descriptor": "Wyoming",
+          "id": "0022bee925f740b0a078f707a1868642",
+          "count": 2
+        },
+        {
+          "descriptor": "Wisconsin",
+          "id": "96f29b3353ac4653b1a860751618e36b",
+          "count": 2
+        },
+        {
+          "descriptor": "Ohio",
+          "id": "41493c81d9214eb190fd14067c7d974d",
+          "count": 2
+        },
+        {
+          "descriptor": "Maine",
+          "id": "b6d5367355b64eebb870b465d2e72205",
+          "count": 2
+        },
+        {
+          "descriptor": "Pulau Pinang (Penang)",
+          "id": "05b047780403433b9a3b8f92e8ad0dd5",
+          "count": 2
+        },
+        {
+          "descriptor": "Harjumaa",
+          "id": "8088f4062bd74080a1c6bc1e9138544f",
+          "count": 2
+        },
+        {
+          "descriptor": "Colorado",
+          "id": "a83d6eabae3b49718c4ce09eeb66fd0b",
+          "count": 2
+        },
+        {
+          "descriptor": "Arkansas",
+          "id": "cea6c5355e1b4983b5fd0640310385b5",
+          "count": 2
+        },
+        {
+          "descriptor": "Bangkok",
+          "id": "9f7476048d3b4903a0af3f257bfc6d2c",
+          "count": 2
+        },
+        {
+          "descriptor": "Region Metropolitana de Santiago",
+          "id": "ea75ae953e9d45ce87314070d8c528b0",
+          "count": 2
+        },
+        {
+          "descriptor": "Shandong",
+          "id": "396ab842754f4087af43c5e9c1d2a993",
+          "count": 2
+        },
+        {
+          "descriptor": "Anhui",
+          "id": "75fdf1c4ee6f425e935f84a6e540e2e6",
+          "count": 2
+        },
+        {
+          "descriptor": "Tianjin",
+          "id": "c52bffa06ef94a53ac0e90a7708acaad",
+          "count": 2
+        },
+        {
+          "descriptor": "Nei Mongol",
+          "id": "8351e9ccb183448a974fd81abf4e395b",
+          "count": 1
+        },
+        {
+          "descriptor": "Hebei",
+          "id": "b1e7460d2ef6470ea14f09201b475a46",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "facetParameter": "jobFamilyGroup",
+      "descriptor": "Job Category",
+      "values": [
+        {
+          "descriptor": "Sales",
+          "id": "3f2e9c559097013d823941d1700e7e65",
+          "count": 150
+        },
+        {
+          "descriptor": "Medical",
+          "id": "3f2e9c55909701ab777f1ad1700e6e65",
+          "count": 82
+        },
+        {
+          "descriptor": "Marketing and Market Research",
+          "id": "3f2e9c5590970141caf408d1700e6665",
+          "count": 58
+        },
+        {
+          "descriptor": "Information & Business Tech",
+          "id": "3f2e9c559097010902f9fed0700e6465",
+          "count": 38
+        },
+        {
+          "descriptor": "Support Services",
+          "id": "ec5ff75fd5f40162d960891000600b91",
+          "count": 32
+        },
+        {
+          "descriptor": "Quality Assurance and Control",
+          "id": "3f2e9c55909701ce3734f4d0700e6065",
+          "count": 29
+        },
+        {
+          "descriptor": "Research and Development",
+          "id": "3f2e9c55909701184ce4edd0700e5e65",
+          "count": 23
+        },
+        {
+          "descriptor": "Manufacturing",
+          "id": "3f2e9c55909701cf095a64d1700e8e65",
+          "count": 17
+        },
+        {
+          "descriptor": "Engineering",
+          "id": "3f2e9c55909701d3ae9853d1700e8665",
+          "count": 14
+        },
+        {
+          "descriptor": "Market Access",
+          "id": "3f2e9c55909701a5650b46d1700e8065",
+          "count": 12
+        },
+        {
+          "descriptor": "People Experience",
+          "id": "3f2e9c559097011ec48e15d1700e6c65",
+          "count": 8
+        },
+        {
+          "descriptor": "Regulatory Affairs",
+          "id": "3f2e9c55909701b074e310d1700e6a65",
+          "count": 7
+        },
+        {
+          "descriptor": "Sales Training",
+          "id": "ec5ff75fd5f40126018e7cb9ff5f478f",
+          "count": 7
+        },
+        {
+          "descriptor": "Logistics & Supply Chain Mgmt",
+          "id": "3f2e9c559097016052f335d1700e7a65",
+          "count": 7
+        },
+        {
+          "descriptor": "Mkt & Sales/Commercial Bus",
+          "id": "3f2e9c55909701bdd1f623d1700e7265",
+          "count": 7
+        },
+        {
+          "descriptor": "Administrative",
+          "id": "3f2e9c55909701c9565e4ad1700e8265",
+          "count": 6
+        },
+        {
+          "descriptor": "Finance & Accounting",
+          "id": "3f2e9c55909701ecdb88f9d0700e6265",
+          "count": 5
+        },
+        {
+          "descriptor": "Environmental, Health & Safety",
+          "id": "3f2e9c55909701183c4f58d1700e8865",
+          "count": 3
+        },
+        {
+          "descriptor": "Continuous Imprv and Proj Mgmt",
+          "id": "3f2e9c55909701b53fda39d1700e7c65",
+          "count": 3
+        },
+        {
+          "descriptor": "Global Operations",
+          "id": "3f2e9c559097012d6b174fd1700e8465",
+          "count": 2
+        },
+        {
+          "descriptor": "Legal Affairs",
+          "id": "3f2e9c55909701abae8431d1700e7865",
+          "count": 2
+        },
+        {
+          "descriptor": "Public Affairs & Communication",
+          "id": "3f2e9c55909701c05ae01fd1700e7065",
+          "count": 2
+        },
+        {
+          "descriptor": "Bus Dev & Strategic Planning",
+          "id": "3f2e9c55909701949c6828d1700e7465",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "facetParameter": "startDate",
+      "descriptor": "Posting Date",
+      "values": [
+        {
+          "descriptor": "Within the last 7 days",
+          "id": "a6e09e1f3296100014ae1d5e16f80099",
+          "count": 159
+        },
+        {
+          "descriptor": "8 - 30 days ago",
+          "id": "a6e09e1f3296100014ae1d666dbe009a",
+          "count": 322
+        },
+        {
+          "descriptor": "31 - 120  days ago",
+          "id": "a6e09e1f3296100014ae1d700784009b",
+          "count": 6
+        },
+        {
+          "descriptor": "121 - 365 days ago",
+          "id": "a6e09e1f3296100014ae1d79630e009c",
+          "count": 24
+        },
+        {
+          "descriptor": "Over 365 days ago",
+          "id": "a6e09e1f3296100014ae1d82d13b009d",
+          "count": 8
+        }
+      ]
+    },
+    {
+      "facetParameter": "timeType",
+      "descriptor": "Time Type",
+      "values": [
+        {
+          "descriptor": "Full time",
+          "id": "eca4e89f1e9b100039b560884e300467",
+          "count": 514
+        },
+        {
+          "descriptor": "Part time",
+          "id": "eca4e89f1e9b100039b56059be300466",
+          "count": 1
+        }
+      ]
+    },
+    {
+      "facetParameter": "workerSubType",
+      "descriptor": "Job Type",
+      "values": [
+        {
+          "descriptor": "Regular",
+          "id": "3f2e9c55909701e9a9608678590e4707",
+          "count": 465
+        },
+        {
+          "descriptor": "Fixed Term (Fixed Term)",
+          "id": "3f2e9c559097011d7c309778590e4807",
+          "count": 25
+        },
+        {
+          "descriptor": "Temporary",
+          "id": "3f2e9c55909701dd6bbf9b78590e4907",
+          "count": 14
+        },
+        {
+          "descriptor": "Trainee (Trainee)",
+          "id": "3f2e9c559097016107f7a378590e4b07",
+          "count": 11
+        }
+      ]
+    },
+    {
+      "facetParameter": "locationMainGroup",
+      "values": [
+        {
+          "facetParameter": "locations",
+          "descriptor": "All Locations",
+          "values": [
+            {
+              "descriptor": "Argentina - Buenos Aires",
+              "id": "e2d3979e3af101fd537c4976076c5baa",
+              "count": 2
+            },
+            {
+              "descriptor": "Argentina - Remote",
+              "id": "e2d3979e3af101573e2f874f076c8e88",
+              "count": 1
+            },
+            {
+              "descriptor": "Australia - New South Wales - Sydney",
+              "id": "e2d3979e3af101ac8cac8d4f076c9388",
+              "count": 1
+            },
+            {
+              "descriptor": "Belgium - Puurs",
+              "id": "e2d3979e3af101159cb7ff4f076cf688",
+              "count": 3
+            },
+            {
+              "descriptor": "Belgium - Zaventem",
+              "id": "e2d3979e3af101dd8bf01c50076c0f89",
+              "count": 2
+            },
+            {
+              "descriptor": "Bulgaria - Bulgaria",
+              "id": "e2d3979e3af101ef38d97750076c5089",
+              "count": 1
+            },
+            {
+              "descriptor": "Bulgaria - Sofia",
+              "id": "e2d3979e3af1018333ca8250076c5a89",
+              "count": 1
+            },
+            {
+              "descriptor": "Canada - Ontario - Remote",
+              "id": "e2d3979e3af10175ff2f2451076ca089",
+              "count": 1
+            },
+            {
+              "descriptor": "Canada - Quebec - Kirkland",
+              "id": "e2d3979e3af1010ac1673051076caa89",
+              "count": 5
+            },
+            {
+              "descriptor": "Canada - Quebec - Montreal",
+              "id": "e2d3979e3af101f539b23651076caf89",
+              "count": 1
+            },
+            {
+              "descriptor": "Canada - Remote",
+              "id": "7486f8ea5dc701f62634c731850bb536",
+              "count": 2
+            },
+            {
+              "descriptor": "Chile - Santiago",
+              "id": "e2d3979e3af1016b57fa6876076c86aa",
+              "count": 2
+            },
+            {
+              "descriptor": "China - Anhui - Hefei",
+              "id": "a1c79c1de5370196192260f7152686a5",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Beijing - Beijing",
+              "id": "e2d3979e3af10198669d8451076cf689",
+              "count": 44
+            },
+            {
+              "descriptor": "China - Chongqing - Chongqing",
+              "id": "e2d3979e3af1017bd65c9951076cfb89",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Fujian - Fuzhou",
+              "id": "e2d3979e3af10150874cba51076c198a",
+              "count": 3
+            },
+            {
+              "descriptor": "China - Fujian - Quanzhou",
+              "id": "a1c79c1de53701151667b2f71526d4a5",
+              "count": 2
+            },
+            {
+              "descriptor": "China - Fujian - Xiamen",
+              "id": "e2d3979e3af1010cc17ed251076c2d8a",
+              "count": 2
+            },
+            {
+              "descriptor": "China - Fujian - Zhangzhou",
+              "id": "e2d3979e3af1012a7505d851076c328a",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Guangdong - Dongguan",
+              "id": "e2d3979e3af1010f06dce251076c3c8a",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Guangdong - Guangzhou",
+              "id": "e2d3979e3af101e63a83ed51076c468a",
+              "count": 8
+            },
+            {
+              "descriptor": "China - Guangdong - Shanwei",
+              "id": "e2d3979e3af1017605920d52076c648a",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Guangdong - Shenzhen",
+              "id": "e2d3979e3af101e879e31352076c698a",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Guangdong - Zhuhai",
+              "id": "e2d3979e3af10191cc743452076c828a",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Guangxi - GuiGang",
+              "id": "a1c79c1de53701638ee244f815265fa6",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Hebei - Shijiazhuang",
+              "id": "e2d3979e3af101d2b82ca652076ce68a",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Heilongjiang - Haerbin",
+              "id": "e2d3979e3af10174ee39b152076cf08a",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Henan - Zhengzhou",
+              "id": "e2d3979e3af1013efa6ddc52076c188b",
+              "count": 4
+            },
+            {
+              "descriptor": "China - Hubei - Huangshi",
+              "id": "e2d3979e3af101e8d7f8f852076c328b",
+              "count": 2
+            },
+            {
+              "descriptor": "China - Hubei - Wuhan",
+              "id": "e2d3979e3af1014d6c862153076c558b",
+              "count": 2
+            },
+            {
+              "descriptor": "China - Hubei - Xiaogan",
+              "id": "e2d3979e3af1014050253753076c698b",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Hunan - Changsha",
+              "id": "e2d3979e3af1012e54634253076c738b",
+              "count": 3
+            },
+            {
+              "descriptor": "China - Jiangsu - Changzhou",
+              "id": "e2d3979e3af101e7ac4b6553076c9f8b",
+              "count": 2
+            },
+            {
+              "descriptor": "China - Jiangsu - Huai'An",
+              "id": "a1c79c1de53701420e2cfbf91526f8a7",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Jiangsu - LianYungang",
+              "id": "a1c79c1de5370154fe6a05fa152602a8",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Jiangsu - Nanjing",
+              "id": "e2d3979e3af1015d69157653076caf8b",
+              "count": 8
+            },
+            {
+              "descriptor": "China - Jiangsu - Nantong",
+              "id": "a1c79c1de53701b56cf60afa152607a8",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Jiangsu - SuQian",
+              "id": "a1c79c1de53701454c4010fa15260ca8",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Jiangsu - Suzhou",
+              "id": "e2d3979e3af1011cca877b53076cb48b",
+              "count": 3
+            },
+            {
+              "descriptor": "China - Jiangsu - Taizhou",
+              "id": "a1c79c1de5370182905220fa15261ba8",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Jiangsu - Wuxi",
+              "id": "e2d3979e3af101f1e8fb8753076cbe8b",
+              "count": 8
+            },
+            {
+              "descriptor": "China - Jiangsu - Xuzhou",
+              "id": "a1c79c1de53701237d4925fa152620a8",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Jiangsu - Yancheng",
+              "id": "a1c79c1de53701dcf5ac2afa152625a8",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Jiangsu - Yangzhou",
+              "id": "a1c79c1de537010aa6b72ffa15262aa8",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Jiangsu - Zhenjiang",
+              "id": "a1c79c1de53701d8327e3afa152634a8",
+              "count": 2
+            },
+            {
+              "descriptor": "China - Jiangxi - GanZhou",
+              "id": "a1c79c1de53701b3ae5145fa15263ea8",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Jiangxi - Ji'An",
+              "id": "e2d3979e3af10132959daa53076cd78b",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Jiangxi - Nanchang",
+              "id": "a1c79c1de5370176932355fa15264da8",
+              "count": 3
+            },
+            {
+              "descriptor": "China - Liaoning - Dalian",
+              "id": "e2d3979e3af101f4ff93d353076cfa8b",
+              "count": 6
+            },
+            {
+              "descriptor": "China - Liaoning - Shenyang",
+              "id": "e2d3979e3af10145b146d953076cff8b",
+              "count": 3
+            },
+            {
+              "descriptor": "China - Liaoning - YingKou",
+              "id": "a1c79c1de53701c1860a24fb15260ba9",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Neimenggu - Baotou",
+              "id": "a1c79c1de537011482c133fb15261aa9",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Neimenggu - E'erDuosi",
+              "id": "a1c79c1de5370174c6c945fb152625a9",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Shandong - Jinan",
+              "id": "e2d3979e3af1010192600454076c278c",
+              "count": 2
+            },
+            {
+              "descriptor": "China - Shanghai - Shanghai",
+              "id": "a1c79c1de537019aef17e7fb1526b7a9",
+              "count": 54
+            },
+            {
+              "descriptor": "China - Shanghai - STIT",
+              "id": "7dcccf9901701001ed895fb60a960000",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Shanxi - Xi'an",
+              "id": "e2d3979e3af1010af93cf953076c1d8c",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Sichuan - Chengdu",
+              "id": "e2d3979e3af101482ad92254076c408c",
+              "count": 3
+            },
+            {
+              "descriptor": "China - Tianjin - Tianjin",
+              "id": "e2d3979e3af1017855cf2854076c458c",
+              "count": 2
+            },
+            {
+              "descriptor": "China - Zhejiang - Hangzhou",
+              "id": "e2d3979e3af1011b90fdb454076cc18c",
+              "count": 8
+            },
+            {
+              "descriptor": "China - Zhejiang - Huzhou",
+              "id": "e2d3979e3af10151aa496154076c778c",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Zhejiang - Jinhua",
+              "id": "a1c79c1de537012e2407dcfd152680ab",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Zhejiang - Ningbo",
+              "id": "e2d3979e3af1015eac587254076c818c",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Zhejiang - Shaoxing",
+              "id": "e2d3979e3af101c4cc108954076c998c",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Zhejiang - Taizhou",
+              "id": "a1c79c1de5370139220febfd15268fab",
+              "count": 1
+            },
+            {
+              "descriptor": "China - Zhejiang - Wenzhou",
+              "id": "e2d3979e3af1018998ea9854076ca88c",
+              "count": 4
+            },
+            {
+              "descriptor": "CHN - AH - Anhui",
+              "id": "664ca7a4c04601f518ac5fe21910d8b5",
+              "count": 2
+            },
+            {
+              "descriptor": "CHN - BJ - Beijing Office",
+              "id": "664ca7a4c0460104bac47ee719102dbb",
+              "count": 1
+            },
+            {
+              "descriptor": "CHN - HB - Hubei",
+              "id": "664ca7a4c046014e486aade219102db6",
+              "count": 1
+            },
+            {
+              "descriptor": "CHN - SH - Shanghai",
+              "id": "664ca7a4c04601e3ae07c4e6191083ba",
+              "count": 1
+            },
+            {
+              "descriptor": "CHN - ZJ - Zhejiang",
+              "id": "664ca7a4c046011a9cd475e21910f1b5",
+              "count": 1
+            },
+            {
+              "descriptor": "Colombia - Bogota",
+              "id": "e2d3979e3af101462c61c054076ccb8c",
+              "count": 1
+            },
+            {
+              "descriptor": "Colombia - Bogota - Suba",
+              "id": "e2d3979e3af101205e81c554076cd08c",
+              "count": 2
+            },
+            {
+              "descriptor": "Costa Rica - Escazu",
+              "id": "e2d3979e3af1019f88aef754076cfd8c",
+              "count": 1
+            },
+            {
+              "descriptor": "Croatia - Zagreb",
+              "id": "e2d3979e3af1011c3a0e2855076c268d",
+              "count": 11
+            },
+            {
+              "descriptor": "Estonia - Tallinn",
+              "id": "e2d3979e3af1011a26a8b255076ca38d",
+              "count": 2
+            },
+            {
+              "descriptor": "Europe - Any Pfizer Site",
+              "id": "e2d3979e3af1016b9731b676076cccaa",
+              "count": 3
+            },
+            {
+              "descriptor": "France - Paris",
+              "id": "e2d3979e3af10187be5f2e56076c118e",
+              "count": 1
+            },
+            {
+              "descriptor": "France - Rives de Paris",
+              "id": "e2d3979e3af1017740ad4e56076c2f8e",
+              "count": 3
+            },
+            {
+              "descriptor": "Germany - Berlin",
+              "id": "e2d3979e3af101d5cf4c5456076c348e",
+              "count": 2
+            },
+            {
+              "descriptor": "Germany - Freiburg",
+              "id": "e2d3979e3af101d8b3795956076c398e",
+              "count": 3
+            },
+            {
+              "descriptor": "Greece - Athens - N. Psychiko",
+              "id": "e2d3979e3af10169ad547a56076c588e",
+              "count": 3
+            },
+            {
+              "descriptor": "Greece-Thessaloniki Chortiatis",
+              "id": "896e2b51ebcf01f0e399d93db100e044",
+              "count": 16
+            },
+            {
+              "descriptor": "Greece - Thessaloniki Pylaia",
+              "id": "0a3759c2c355017d8aed2eb1ef01eb59",
+              "count": 4
+            },
+            {
+              "descriptor": "Hong Kong - Quarry Bay",
+              "id": "e2d3979e3af101b146b5ea56076c868e",
+              "count": 3
+            },
+            {
+              "descriptor": "IDM - Any Pfizer Site",
+              "id": "7cd5f9a613e81001557da36f61fa0000",
+              "count": 1
+            },
+            {
+              "descriptor": "India - Ahmedabad",
+              "id": "e2d3979e3af101bd3b92fa56076c958e",
+              "count": 2
+            },
+            {
+              "descriptor": "India - Chennai",
+              "id": "e2d3979e3af101936db42457076cbe8e",
+              "count": 7
+            },
+            {
+              "descriptor": "India - Delhi",
+              "id": "e2d3979e3af1012401d02e57076cc88e",
+              "count": 1
+            },
+            {
+              "descriptor": "India - Mumbai",
+              "id": "e2d3979e3af1014c8c757857076c0e8f",
+              "count": 8
+            },
+            {
+              "descriptor": "India - Remote",
+              "id": "e2d3979e3af10152619fa757076c3b8f",
+              "count": 2
+            },
+            {
+              "descriptor": "India - Vizag",
+              "id": "e2d3979e3af10195da701f58076c648f",
+              "count": 16
+            },
+            {
+              "descriptor": "Indonesia - Jakarta",
+              "id": "e2d3979e3af101b34ed0f658076c1590",
+              "count": 1
+            },
+            {
+              "descriptor": "Ireland - Dublin - Grange Castle",
+              "id": "e2d3979e3af101cb6c9c1a59076c3890",
+              "count": 3
+            },
+            {
+              "descriptor": "Italy - Rome",
+              "id": "e2d3979e3af10174539d6b59076c7e90",
+              "count": 1
+            },
+            {
+              "descriptor": "Japan - Aichi",
+              "id": "e2d3979e3af101bd9288cc5a076ccd91",
+              "count": 1
+            },
+            {
+              "descriptor": "Japan - Tokyo",
+              "id": "e2d3979e3af101f67fa8705b076c6892",
+              "count": 25
+            },
+            {
+              "descriptor": "Korea, Republic of - Seoul",
+              "id": "e2d3979e3af10199d8a42c5c076c0393",
+              "count": 3
+            },
+            {
+              "descriptor": "Latvia - Latvia",
+              "id": "e2d3979e3af101cea8223c5c076c1293",
+              "count": 1
+            },
+            {
+              "descriptor": "Latvia - Riga",
+              "id": "e2d3979e3af1010c932c465c076c1c93",
+              "count": 1
+            },
+            {
+              "descriptor": "Lithuania - Lithuania",
+              "id": "e2d3979e3af101496aad555c076c2b93",
+              "count": 1
+            },
+            {
+              "descriptor": "Lithuania - Vilnius",
+              "id": "e2d3979e3af101128176605c076c3593",
+              "count": 1
+            },
+            {
+              "descriptor": "Malaysia - Johor",
+              "id": "e2d3979e3af101bc45d8755c076c4a93",
+              "count": 1
+            },
+            {
+              "descriptor": "Malaysia - Kuala Lumpur",
+              "id": "e2d3979e3af1018e24f97f5c076c5493",
+              "count": 6
+            },
+            {
+              "descriptor": "Malaysia - Penang",
+              "id": "e2d3979e3af101d973428f5c076c6393",
+              "count": 2
+            },
+            {
+              "descriptor": "Mexico - Mexico City",
+              "id": "e2d3979e3af1017cf356855d076cbe93",
+              "count": 5
+            },
+            {
+              "descriptor": "Mexico - Remote",
+              "id": "e2d3979e3af1018fabdcb85d076cf093",
+              "count": 2
+            },
+            {
+              "descriptor": "Mexico - Toluca",
+              "id": "e2d3979e3af101b011c5d75d076c0e94",
+              "count": 2
+            },
+            {
+              "descriptor": "Morocco - Casablanca",
+              "id": "e2d3979e3af101670e04e85d076c1d94",
+              "count": 1
+            },
+            {
+              "descriptor": "Netherlands - Capelle Ad Ijssel",
+              "id": "e2d3979e3af101babbd0f75d076c2c94",
+              "count": 1
+            },
+            {
+              "descriptor": "Pakistan - Karachi",
+              "id": "e2d3979e3af101c85f9a3e5e076c6d94",
+              "count": 1
+            },
+            {
+              "descriptor": "Pakistan - Remote",
+              "id": "e2d3979e3af10114d74f435e076c7294",
+              "count": 1
+            },
+            {
+              "descriptor": "Philippines - Makati City",
+              "id": "e2d3979e3af1015b7dbcad5f076cc095",
+              "count": 6
+            },
+            {
+              "descriptor": "Philippines - NCR (Natonal Capital Region)",
+              "id": "e2d3979e3af1011e4057d75f076ce895",
+              "count": 1
+            },
+            {
+              "descriptor": "Poland - Warsaw",
+              "id": "e2d3979e3af10196ad1afc60076cec96",
+              "count": 2
+            },
+            {
+              "descriptor": "Romania - Bucharest",
+              "id": "e2d3979e3af10101e2ff1f61076c1097",
+              "count": 2
+            },
+            {
+              "descriptor": "Romania - Remote",
+              "id": "e2d3979e3af1012f8fec2961076c1a97",
+              "count": 1
+            },
+            {
+              "descriptor": "Saudi Arabia - Dammam",
+              "id": "e2d3979e3af101440f75bb63076c2f99",
+              "count": 1
+            },
+            {
+              "descriptor": "Saudi Arabia - Riyadh",
+              "id": "e2d3979e3af1013f6268df63076c5299",
+              "count": 1
+            },
+            {
+              "descriptor": "Singapore - CleanTech One",
+              "id": "e2d3979e3af101e70fe5fc63076c7099",
+              "count": 1
+            },
+            {
+              "descriptor": "Singapore - Mapletree Business City",
+              "id": "e2d3979e3af1016d69d80164076c7599",
+              "count": 5
+            },
+            {
+              "descriptor": "Singapore - Tuas",
+              "id": "e2d3979e3af101bdc4651164076c8599",
+              "count": 19
+            },
+            {
+              "descriptor": "South Africa - Sandton",
+              "id": "e2d3979e3af101c20c644964076cbc99",
+              "count": 1
+            },
+            {
+              "descriptor": "Sweden - Strangnas",
+              "id": "e2d3979e3af10147e4a27c65076cea9a",
+              "count": 1
+            },
+            {
+              "descriptor": "Taiwan - Taipei",
+              "id": "8caddf20d7aa012ebb5bfa1988001890",
+              "count": 4
+            },
+            {
+              "descriptor": "Thailand - Bangkok",
+              "id": "e2d3979e3af101cc12bca665076c129b",
+              "count": 2
+            },
+            {
+              "descriptor": "Turkey - Ankara",
+              "id": "e2d3979e3af10133d292ef65076c2b9b",
+              "count": 1
+            },
+            {
+              "descriptor": "Turkey - Istanbul",
+              "id": "e2d3979e3af10173e70dff65076c3a9b",
+              "count": 6
+            },
+            {
+              "descriptor": "United Kingdom - Cambridge",
+              "id": "e2d3979e3af10100421a1466076c4e9b",
+              "count": 1
+            },
+            {
+              "descriptor": "United Kingdom - Sandwich",
+              "id": "e2d3979e3af10153a9fa3666076c719b",
+              "count": 1
+            },
+            {
+              "descriptor": "United Kingdom - Walton Oaks",
+              "id": "e2d3979e3af101f166824066076c7b9b",
+              "count": 6
+            },
+            {
+              "descriptor": "United States - Alabama - Birmingham",
+              "id": "e2d3979e3af101053de4c766076cfe9b",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Alabama - Remote",
+              "id": "e2d3979e3af101f63649eb66076c219c",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Arkansas - Fayetteville",
+              "id": "e2d3979e3af1014eba7b4267076c769c",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Arkansas - Remote",
+              "id": "e2d3979e3af101686f6e5b67076c8a9c",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - California - Bakersfield",
+              "id": "e2d3979e3af101d458b26967076c999c",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - California - Fresno",
+              "id": "e2d3979e3af10133dd169767076ce09c",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - California - La Jolla",
+              "id": "e2d3979e3af1013ce2e0b567076cfe9c",
+              "count": 20
+            },
+            {
+              "descriptor": "United States - California - Modesto",
+              "id": "e2d3979e3af1018bf18ed567076c1f9d",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - California - Remote",
+              "id": "e2d3979e3af101b12a1a1268076c5b9d",
+              "count": 3
+            },
+            {
+              "descriptor": "United States - California - San Diego",
+              "id": "e2d3979e3af101d827a63568076c899d",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Colorado - Remote",
+              "id": "e2d3979e3af101538857db68076c0e9e",
+              "count": 2
+            },
+            {
+              "descriptor": "United States - Connecticut - Groton",
+              "id": "e2d3979e3af1017d4c10e568076c189e",
+              "count": 28
+            },
+            {
+              "descriptor": "United States - Connecticut - Remote",
+              "id": "e2d3979e3af101e3aad9f868076c2c9e",
+              "count": 2
+            },
+            {
+              "descriptor": "United States - Delaware - Remote",
+              "id": "e2d3979e3af101faf6511569076c4a9e",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Delaware - Wilmington",
+              "id": "e2d3979e3af101e2ff1a1a69076c4f9e",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Florida - Fort Lauderdale",
+              "id": "e2d3979e3af10129a0bf4c69076c819e",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Florida - Orlando",
+              "id": "e2d3979e3af101285e1d9769076cc79e",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Florida - Remote",
+              "id": "e2d3979e3af10134e431c869076cfa9e",
+              "count": 5
+            },
+            {
+              "descriptor": "United States - Florida - Tampa",
+              "id": "e2d3979e3af101f62931e669076c189f",
+              "count": 6
+            },
+            {
+              "descriptor": "United States - Georgia - Macon",
+              "id": "e2d3979e3af101bb7d15236a076c549f",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Georgia - Remote",
+              "id": "e2d3979e3af1010d81b2336a076c639f",
+              "count": 5
+            },
+            {
+              "descriptor": "United States - Georgia - Savannah",
+              "id": "e2d3979e3af101eb00493e6a076c6d9f",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Idaho - Boise",
+              "id": "e2d3979e3af101c993b94d6a076c7c9f",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Idaho - Remote",
+              "id": "e2d3979e3af101b7ccf2576a076c869f",
+              "count": 3
+            },
+            {
+              "descriptor": "United States - Illinois - Lake Forest",
+              "id": "e2d3979e3af101c29584b16a076ce19f",
+              "count": 11
+            },
+            {
+              "descriptor": "United States - Kansas - McPherson",
+              "id": "e2d3979e3af101f990d46f6b076c9da0",
+              "count": 3
+            },
+            {
+              "descriptor": "United States - Louisiana - Remote",
+              "id": "e2d3979e3af101573c26ff6b076c30a1",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Maine - Portland",
+              "id": "e2d3979e3af1013a87f8136c076c44a1",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Maine - Remote",
+              "id": "e2d3979e3af1016e5436196c076c49a1",
+              "count": 2
+            },
+            {
+              "descriptor": "United States - Massachusetts - Andover",
+              "id": "e2d3979e3af101f93fff686c076c94a1",
+              "count": 10
+            },
+            {
+              "descriptor": "United States - Massachusetts - Cambridge",
+              "id": "e2d3979e3af101ae0c7e786c076ca3a1",
+              "count": 31
+            },
+            {
+              "descriptor": "United States - Massachusetts - Remote",
+              "id": "e2d3979e3af1016a395cae6c076cd5a1",
+              "count": 2
+            },
+            {
+              "descriptor": "United States - Massachusetts - Worcester",
+              "id": "e2d3979e3af1014b1dd9c26c076ce4a1",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Michigan - Remote",
+              "id": "e2d3979e3af101a77d83276d076c51a2",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Michigan - Rochester",
+              "id": "e2d3979e3af10117d4672c6d076c56a2",
+              "count": 2
+            },
+            {
+              "descriptor": "United States - Mississippi - Remote",
+              "id": "e2d3979e3af101fa5717b16d076ccea2",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Missouri - St. Louis",
+              "id": "e2d3979e3af101e60eb9e96d076c05a3",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Missouri - St. Louis - Chesterfield",
+              "id": "e2d3979e3af1012ffe66f46d076c0fa3",
+              "count": 3
+            },
+            {
+              "descriptor": "United States - New Hampshire - Lebanon",
+              "id": "e2d3979e3af10170a3c7ba6e076c69a3",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - New Hampshire - Remote",
+              "id": "e2d3979e3af101a1a8bacf6e076c7da3",
+              "count": 2
+            },
+            {
+              "descriptor": "United States - New Jersey - Camden",
+              "id": "e2d3979e3af10191c839e36e076c91a3",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - New Jersey - Remote",
+              "id": "e2d3979e3af101359e75496f076cf5a3",
+              "count": 4
+            },
+            {
+              "descriptor": "United States - New Mexico - Remote",
+              "id": "e2d3979e3af101b52e7b836f076c2da4",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - New York - Albany",
+              "id": "e2d3979e3af10168b2b2886f076c32a4",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - New York - New York City",
+              "id": "e2d3979e3af1017da8c7eb6f076c9da4",
+              "count": 45
+            },
+            {
+              "descriptor": "United States - New York - Pearl River",
+              "id": "e2d3979e3af101a9129df96f076ca7a4",
+              "count": 14
+            },
+            {
+              "descriptor": "United States - New York - Remote",
+              "id": "e2d3979e3af101b62d8a0970076cb7a4",
+              "count": 6
+            },
+            {
+              "descriptor": "United States - North Carolina - Fayetteville",
+              "id": "e2d3979e3af101cf52186d70076c24a5",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - North Carolina - Raleigh",
+              "id": "e2d3979e3af1013232068c70076c42a5",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - North Carolina - Remote",
+              "id": "e2d3979e3af10163b50f9170076c47a5",
+              "count": 2
+            },
+            {
+              "descriptor": "United States - North Carolina - Sanford",
+              "id": "e2d3979e3af101755a330971076c56a5",
+              "count": 2
+            },
+            {
+              "descriptor": "United States - North Carolina - Wilmington",
+              "id": "e2d3979e3af10117847a1371076c60a5",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Ohio - Akron",
+              "id": "e2d3979e3af1018fa7fd2c71076c79a5",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Ohio - Columbus",
+              "id": "e2d3979e3af101a2e2e56d71076c97a5",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Ohio - Dayton",
+              "id": "e2d3979e3af101c3fc1f7371076c9ca5",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Ohio - Remote",
+              "id": "e2d3979e3af101bc56a1a771076ccea5",
+              "count": 2
+            },
+            {
+              "descriptor": "United States - Oklahoma - Remote",
+              "id": "e2d3979e3af101ac58f0dc71076c05a6",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Oregon - Portland",
+              "id": "e2d3979e3af10171a478eb71076c14a6",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Oregon - Remote",
+              "id": "e2d3979e3af101845f57f071076c19a6",
+              "count": 3
+            },
+            {
+              "descriptor": "United States - Pennsylvania - Collegeville",
+              "id": "e2d3979e3af1012449191072076c37a6",
+              "count": 35
+            },
+            {
+              "descriptor": "United States - Pennsylvania - Philadelphia",
+              "id": "e2d3979e3af10135f62c5e72076c8aa6",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Pennsylvania - Remote",
+              "id": "e2d3979e3af1013f82216d72076c99a6",
+              "count": 3
+            },
+            {
+              "descriptor": "United States - Remote",
+              "id": "e2d3979e3af1018e50d9c672076ceea6",
+              "count": 12
+            },
+            {
+              "descriptor": "United States - Rhode Island - Providence",
+              "id": "e2d3979e3af10197d27d9f72076cc6a6",
+              "count": 2
+            },
+            {
+              "descriptor": "United States - Rhode Island - Remote",
+              "id": "e2d3979e3af1012a69e1d072076cf8a6",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - South Carolina - Myrtle Beach",
+              "id": "e2d3979e3af101a108b2ee72076c16a7",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Tennessee - Bristol",
+              "id": "e2d3979e3af1016021600b73076c34a7",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Tennessee - Johnson City",
+              "id": "e2d3979e3af1017fda6c3373076c5ca7",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Tennessee - Kingsport",
+              "id": "e2d3979e3af1010dee403873076c61a7",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Tennessee - Knoxville",
+              "id": "e2d3979e3af101e4661d3d73076c66a7",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Tennessee - Memphis",
+              "id": "e2d3979e3af1015861fe4673076c70a7",
+              "count": 3
+            },
+            {
+              "descriptor": "United States - Tennessee - Memphis GFS",
+              "id": "a1c79c1de537013ac11b6938e82665ee",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Tennessee - Remote",
+              "id": "e2d3979e3af10150404b5573076c7fa7",
+              "count": 2
+            },
+            {
+              "descriptor": "United States - Texas - Dallas",
+              "id": "e2d3979e3af10170b8e59573076cc0a7",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Texas - Houston",
+              "id": "e2d3979e3af101e597adb473076cdea7",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Texas - Remote",
+              "id": "e2d3979e3af101c35c83ed73076c15a8",
+              "count": 4
+            },
+            {
+              "descriptor": "United States - Vermont - Remote",
+              "id": "e2d3979e3af101aa4bc44574076c6fa8",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Virginia - Alexandria",
+              "id": "e2d3979e3af101e7d3ce4f74076c79a8",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Virginia - Remote",
+              "id": "e2d3979e3af101fa0e0e9e74076cbfa8",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Virginia - Richmond Bayberry",
+              "id": "c2e72ecd02cb0108c8a2d9a2f001adff",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Virginia - Virginia Beach",
+              "id": "e2d3979e3af10182764db774076cd8a8",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Washington – Bothell",
+              "id": "754e4fc147871001ebde7ad2252a0000",
+              "count": 23
+            },
+            {
+              "descriptor": "United States - Washington - Remote",
+              "id": "e2d3979e3af10152e1c9de74076c00a9",
+              "count": 4
+            },
+            {
+              "descriptor": "United States - Washington - Seattle",
+              "id": "e2d3979e3af1019365d8e374076c05a9",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Washington - Spokane",
+              "id": "e2d3979e3af101f3c80fe974076c0aa9",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Wisconsin - Green Bay",
+              "id": "e2d3979e3af101e05bb32b75076c4ba9",
+              "count": 2
+            },
+            {
+              "descriptor": "United States - Wisconsin - Milwaukee",
+              "id": "e2d3979e3af10153c52e3b75076c5aa9",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Wisconsin - Remote",
+              "id": "e2d3979e3af1013ee8e04575076c64a9",
+              "count": 1
+            },
+            {
+              "descriptor": "United States - Wyoming - Remote",
+              "id": "e2d3979e3af1018e29376875076c7ea9",
+              "count": 2
+            },
+            {
+              "descriptor": "Viet Nam - An Giang",
+              "id": "e2d3979e3af10106ae5e8c75076ca1a9",
+              "count": 1
+            },
+            {
+              "descriptor": "Viet Nam - Can Tho",
+              "id": "e2d3979e3af1016d5aa6ba75076ccea9",
+              "count": 2
+            },
+            {
+              "descriptor": "Viet Nam - Dong Nai",
+              "id": "e2d3979e3af1018af26bca75076cdea9",
+              "count": 1
+            },
+            {
+              "descriptor": "Viet Nam - Dong Thap",
+              "id": "e2d3979e3af10163cd6dcf75076ce3a9",
+              "count": 1
+            },
+            {
+              "descriptor": "Viet Nam - Hanoi",
+              "id": "e2d3979e3af101b401d12f76076c42aa",
+              "count": 4
+            },
+            {
+              "descriptor": "Viet Nam - Ho Chi Minh",
+              "id": "e2d3979e3af1013c78e43476076c47aa",
+              "count": 7
+            },
+            {
+              "descriptor": "Viet Nam - Kien Giang",
+              "id": "e2d3979e3af10175fd9ce375076cf7a9",
+              "count": 1
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "userAuthenticated": false
+}

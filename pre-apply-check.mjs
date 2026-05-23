@@ -21,6 +21,7 @@
 
 import { chromium } from 'playwright';
 import { classifyLiveness } from './liveness-core.mjs';
+import { classifyWithConsensus, waitForStableDOM } from './classify-work-mode.mjs';
 
 async function checkUrl(page, url) {
   try {
@@ -28,8 +29,12 @@ async function checkUrl(page, url) {
 
     const status = response?.status() ?? 0;
 
-    // Give SPAs (Ashby, Lever, Workday) time to hydrate
-    await page.waitForTimeout(2000);
+    // Give SPAs (Ashby, Lever, Workday) time to hydrate — dynamic polling
+    // (CP3 Phase A: substitutes the prior fixed 2000ms wait).
+    const wait = await waitForStableDOM(page);
+    if (!wait.stable) {
+      process.stderr.write(`[pre-apply] dom-stable: waited=${wait.waitedMs}ms (TIMEOUT) — classification on partial DOM\n`);
+    }
 
     const finalUrl = page.url();
     const bodyText = await page.evaluate(() => document.body?.innerText ?? '');
@@ -66,7 +71,30 @@ async function checkUrl(page, url) {
         .filter(Boolean);
     });
 
-    return classifyLiveness({ status, finalUrl, bodyText, applyControls });
+    const liveness = classifyLiveness({ status, finalUrl, bodyText, applyControls });
+
+    // Enrich when liveness is ACTIVE via consensus voting (CP3.5 Fase A):
+    // 3 independent classification runs of the same URL, majority-tier wins.
+    // Latency budget ~3x single classification (~12-15s total for pre-apply) —
+    // acceptable per CP3.5 spec ("pre-apply é momento crítico"). Backward
+    // compat: `enriched` is a pure additive JSON field.
+    if (liveness.result === 'active') {
+      try {
+        const cls = await classifyWithConsensus(page, url);
+        liveness.enriched = {
+          work_mode: cls.work_mode,
+          br_eligible: cls.br_eligible,
+          tier: cls.tier,
+          location_real: cls.location_real,
+          evidence: cls.evidence,
+          consensus: cls.consensus,
+        };
+      } catch (err) {
+        liveness.enriched = { error: err.message.split('\n')[0].slice(0, 120) };
+      }
+    }
+
+    return liveness;
 
   } catch (err) {
     return { result: 'expired', reason: `navigation error: ${err.message.split('\n')[0]}` };
@@ -104,20 +132,25 @@ async function main() {
   }
 
   const browser = await chromium.launch({ headless: true });
-  let result, reason;
+  let result, reason, enriched;
 
   try {
     const page = await browser.newPage();
-    ({ result, reason } = await checkUrl(page, url));
+    ({ result, reason, enriched } = await checkUrl(page, url));
   } finally {
     await browser.close();
   }
 
   const output = { result, reason, job_num: jobNum, url };
+  if (enriched) output.enriched = enriched;
 
   // Human-readable to stderr (stdout stays clean JSON)
   if (result === 'active') {
     process.stderr.write('✅ Vaga ativa — prosseguir com geração do pacote\n');
+    if (enriched && !enriched.error) {
+      const conf = enriched.consensus ? ` consensus=${enriched.consensus.confidence}` : '';
+      process.stderr.write(`   work_mode=${enriched.work_mode} br_eligible=${enriched.br_eligible} tier=${enriched.tier} location_real="${enriched.location_real}"${conf}\n`);
+    }
   } else if (result === 'expired') {
     process.stderr.write(`❌ Vaga expirada — abortar geração. Motivo: ${reason}\n`);
   } else {

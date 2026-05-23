@@ -58,6 +58,17 @@ package-lock.json
 /config/profile.yaml
 /article-digest.md
 
+# Master profile (real personal data, NEVER commit)
+# Template lives in templates/master-profile.example.md (committed)
+/docs/resume/master-profile.md
+# Generated variants from master profile
+/docs/resume/cv-*.md
+/cv-eu.md
+/cv-uk.md
+/cv-ie.md
+/cv-br.md
+/cv-us.md
+
 # Generated personal artifacts (any path matches output/)
 /output/cover-letter-*.md
 /output/ats-answers-*.md

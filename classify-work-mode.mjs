@@ -132,14 +132,45 @@ export function extractJsonLdBlocks(html) {
 }
 
 /**
+ * Recursively walk a JSON-LD node looking for a JobPosting. Spec allows
+ * multiple shapes:
+ *   - Top-level `{ "@type": "JobPosting", ... }`                          ✓
+ *   - Top-level `{ "@type": ["JobPosting", "WebPage"], ... }`             ✓
+ *   - Top-level array `[{...}, {...}]`                                    ✓
+ *   - Wrapped under `@graph`: `{ "@graph": [{...JobPosting...}, ...] }`   ✓
+ *
+ * @param {unknown} node
+ * @returns {object|null}
+ */
+function walkForJobPosting(node) {
+  if (!node) return null;
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      const found = walkForJobPosting(item);
+      if (found) return found;
+    }
+    return null;
+  }
+  if (typeof node !== 'object') return null;
+  const t = /** @type {any} */(node)['@type'];
+  if (t === 'JobPosting') return /** @type {object} */ (node);
+  if (Array.isArray(t) && t.includes('JobPosting')) return /** @type {object} */ (node);
+  const graph = /** @type {any} */(node)['@graph'];
+  if (graph) {
+    const found = walkForJobPosting(graph);
+    if (found) return found;
+  }
+  return null;
+}
+
+/**
  * @param {Array<object>} blocks
  * @returns {object|null}
  */
 export function findJobPosting(blocks) {
   for (const b of blocks) {
-    const t = b?.['@type'];
-    if (t === 'JobPosting') return b;
-    if (Array.isArray(t) && t.includes('JobPosting')) return b;
+    const found = walkForJobPosting(b);
+    if (found) return found;
   }
   return null;
 }

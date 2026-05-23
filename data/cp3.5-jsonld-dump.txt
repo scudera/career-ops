@@ -1,0 +1,18 @@
+﻿node : 
+No linha:1 caractere:38
++ ... system-ca"; node scripts/dump-jsonld.mjs "https://jobs.iqvia.com/en/j ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+=== [1/2] https://jobs.iqvia.com/en/job/dublin/regulatory-affairs-consultant/24443/79346573504 ===
+[dump-jsonld] waited=2165ms len=14600
+URL: https://jobs.iqvia.com/en/job/dublin/regulatory-affairs-consultant/24443/79346573504
+JSON-LD blocks total: 0
+JobPosting block: (none found)
+
+=== [2/2] https://jobs.iqvia.com/en/job/warsaw/regulatory-affairs-specialist/24443/84974091584 ===
+[dump-jsonld] waited=1091ms len=14600
+URL: https://jobs.iqvia.com/en/job/warsaw/regulatory-affairs-specialist/24443/84974091584
+JSON-LD blocks total: 0
+JobPosting block: (none found)

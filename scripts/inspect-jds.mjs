@@ -44,7 +44,7 @@ export async function inspectOne(page, url, opts = {}) {
       process.stderr.write(`[classify] dom-stable: url=${url.slice(0, 90)} waited=${wait.waitedMs}ms len=${wait.finalLen}${tag}\n`);
       const html = await page.content();
       const bodyText = await page.evaluate(() => document.body?.innerText || '');
-      const cls = classifyFromHtml(html, bodyText);
+      const cls = classifyFromHtml(html, bodyText, url);
       out.work_mode = cls.work_mode;
       out.br_eligible = cls.br_eligible;
       out.tier = cls.tier;

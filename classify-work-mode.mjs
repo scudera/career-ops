@@ -246,13 +246,37 @@ export function locationReal(jp) {
 }
 
 /**
+ * Strip the Phenom "ALL COUNTRIES" nav menu prefix from bodyText. CP3.5
+ * Fase B finding: Phenom career sites (jobs.iqvia.com etc) don't embed
+ * JSON-LD JobPosting (0 blocks) AND the body innerText starts with a
+ * navigation menu hardcoding 80+ country names including "BRAZIL" at
+ * index ~230. That triggers a false-positive BR_OK on the no-JSON-LD
+ * text-fallback path. The menu ends at the sentinel "SEARCH JOBS".
+ *
+ * For non-Phenom URLs returns bodyText unchanged. For Phenom URLs returns
+ * bodyText sliced from after "SEARCH JOBS" if found, else unchanged
+ * (degrades gracefully if Phenom redesigns).
+ *
+ * @param {string} bodyText
+ * @param {string} url
+ * @returns {string}
+ */
+export function stripPhenomNavMenu(bodyText, url) {
+  if (!url || !isPhenomURL(url) || typeof bodyText !== 'string') return bodyText;
+  const idx = bodyText.indexOf('SEARCH JOBS');
+  if (idx < 0) return bodyText;
+  return bodyText.slice(idx + 'SEARCH JOBS'.length);
+}
+
+/**
  * Full-document classification: HTML + body text → Classification.
  *
  * @param {string} html
  * @param {string} bodyText
+ * @param {string} [url] — optional, enables provider-specific defensive rules (CP3.5)
  * @returns {Classification}
  */
-export function classifyFromHtml(html, bodyText) {
+export function classifyFromHtml(html, bodyText, url = '') {
   const blocks = extractJsonLdBlocks(html);
   const jp = findJobPosting(blocks);
   if (jp) {
@@ -271,22 +295,27 @@ export function classifyFromHtml(html, bodyText) {
       evidence,
     };
   }
-  // No JSON-LD → text only
-  const cls = classifyFromText(bodyText);
+  // No JSON-LD → text only. CP3.5 Fase B: strip Phenom nav menu first to
+  // avoid false-positive BR_OK from the hardcoded country list ("ALL
+  // COUNTRIES ... BRAZIL ... BULGARIA ...").
+  const cleanBody = stripPhenomNavMenu(bodyText, url);
+  const stripped = cleanBody !== bodyText;
+  const cls = classifyFromText(cleanBody);
   let location_real = '(not detected)';
   let br_eligible = /** @type {BrEligible} */ ('UNKNOWN');
-  const head = bodyText.slice(0, 800);
+  const head = cleanBody.slice(0, 800);
   const brMatch = head.match(BR_LOCATION_RE);
   if (brMatch) {
     location_real = brMatch[0];
     br_eligible = 'BR_OK';
   }
+  const ev = stripped ? `no JSON-LD; ${cls.evidence} (phenom-nav-stripped)` : `no JSON-LD; ${cls.evidence}`;
   return {
     work_mode: cls.work_mode,
     br_eligible,
     tier: tier(cls.work_mode, br_eligible),
     location_real,
-    evidence: `no JSON-LD; ${cls.evidence}`,
+    evidence: ev,
   };
 }
 
@@ -400,7 +429,7 @@ export async function classifyWithConsensus(page, url, opts = {}) {
     await waitForStableDOM(page);
     const html = await page.content();
     const bodyText = await page.evaluate(() => document.body?.innerText || '');
-    results.push(classifyFromHtml(html, bodyText));
+    results.push(classifyFromHtml(html, bodyText, url));
     if (i < runs - 1) await page.waitForTimeout(delayBetweenMs);
   }
 

@@ -443,5 +443,23 @@ Career-ops ≠ pokerplaybook. CLAUDE.md, MCPs, databases Notion, Supabase, branc
 discussões career-ops, não aplicar protocolo Supabase handoffs de pokerplaybook
 no career-ops. Quando em dúvida, pergunta ao Vitor antes de assumir.
 
+## Output style — reportar em markdown pra colar
+
+Mensagens finais que Vitor possa querer colar em outro lugar (Notion comment,
+chat, PR description, issue, doc) — embrulhar em fenced code blocks
+(` ```markdown ... ``` `) pra preservar formatação raw e facilitar copy-paste.
+
+Aplica especialmente a:
+- Status final de task ou checkpoint (com commit SHA + links)
+- Body de handoff em markdown
+- Snippets, comandos, ou listas de URLs
+- Texto pra colar em issue, PR description, ou Notion page
+
+Resumo executivo curto pode vir como texto normal antes ou depois do block;
+conteúdo "colável" vai sempre dentro de fences. Quando o output tem múltiplas
+peças coláveis distintas (ex: status curto + handoff body + lista de links),
+separá-las em blocks distintos com headers leves (`## 📋 Status update`,
+`## 📜 Handoff body`, `## 🔗 Links`) pra Vitor escolher o que colar onde.
+
 @AGENTS.md
 <!-- Add anything Claude Code specific that other agents don't need -->

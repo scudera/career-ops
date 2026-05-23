@@ -65,6 +65,19 @@ const COUNTRY_TIER_FLOOR = {
 };
 
 const V2_SUFFIX_RE = /T=(\d)\s+wm=(\w+)\s+br=(\w+)(?:\s+loc=(.+))?$/;
+// V21 — each token independently optional (anchor to start of parts[4],
+// not whole line; tokens are space-separated within parts[4]).
+const V21_TOKEN_RES = {
+  employment_type:        /(?:^|\s)et=([A-Z_]+)/,
+  compensation_min:       /(?:^|\s)cmin=(\d+)/,
+  compensation_max:       /(?:^|\s)cmax=(\d+)/,
+  compensation_currency:  /(?:^|\s)ccy=([A-Z]{3})/,
+  compensation_period:    /(?:^|\s)cper=([A-Z_]+)/,
+  posted_at:              /(?:^|\s)posted=(\d{4}-\d{2}-\d{2})/,
+  apply_url:              /(?:^|\s)apply=(https?:\/\/\S+)/,
+};
+const V21_EMPLOYMENT_TYPES = new Set(['FULL_TIME', 'PART_TIME', 'CONTRACT', 'INTERN', 'TEMPORARY', 'UNKNOWN']);
+const V21_COMP_PERIODS = new Set(['HOUR', 'DAY', 'WEEK', 'MONTH', 'YEAR', 'UNKNOWN']);
 const ENTRY_RE = /^- \[([ x])\] (.+)$/;
 const URL_RE = /https?:\/\/[^\s|]+/;
 
@@ -124,7 +137,7 @@ export function checkSalaryFloor(jdText, country) {
  * Parse pipeline.md text into entry records (v2 metadata aware).
  *
  * @param {string} text
- * @returns {Array<{idx: number, checked: boolean, url: string, company: string, title: string, tier: number|null, work_mode: WorkMode|null, br_eligible: BrEligible|null, location_real: string|null, raw: string}>}
+ * @returns {Array<{idx: number, checked: boolean, url: string, company: string, title: string, tier: number|null, work_mode: WorkMode|null, br_eligible: BrEligible|null, location_real: string|null, employment_type: string|null, compensation_min: number|null, compensation_max: number|null, compensation_currency: string|null, compensation_period: string|null, posted_at: string|null, apply_url: string|null, raw: string}>}
  */
 export function parsePipelineEntries(text) {
   const lines = text.split(/\r?\n/);
@@ -152,7 +165,34 @@ export function parsePipelineEntries(text) {
         location_real = v2m[4] || null;
       }
     }
-    out.push({ idx: i, checked, url, company, title, tier, work_mode, br_eligible, location_real, raw: line });
+    // v2.1 parse from parts[4] — each token independently optional.
+    let employment_type = null, compensation_min = null, compensation_max = null,
+        compensation_currency = null, compensation_period = null,
+        posted_at = null, apply_url = null;
+    const v21 = parts[4];
+    if (v21 && v21.includes('=')) {
+      const et = v21.match(V21_TOKEN_RES.employment_type);
+      if (et && V21_EMPLOYMENT_TYPES.has(et[1])) employment_type = et[1];
+      const cmin = v21.match(V21_TOKEN_RES.compensation_min);
+      if (cmin) { const n = parseInt(cmin[1], 10); if (Number.isFinite(n)) compensation_min = n; }
+      const cmax = v21.match(V21_TOKEN_RES.compensation_max);
+      if (cmax) { const n = parseInt(cmax[1], 10); if (Number.isFinite(n)) compensation_max = n; }
+      const ccy = v21.match(V21_TOKEN_RES.compensation_currency);
+      if (ccy) compensation_currency = ccy[1];
+      const cper = v21.match(V21_TOKEN_RES.compensation_period);
+      if (cper && V21_COMP_PERIODS.has(cper[1])) compensation_period = cper[1];
+      const posted = v21.match(V21_TOKEN_RES.posted_at);
+      if (posted) posted_at = posted[1];
+      const apply = v21.match(V21_TOKEN_RES.apply_url);
+      if (apply) apply_url = apply[1];
+    }
+    out.push({
+      idx: i, checked, url, company, title,
+      tier, work_mode, br_eligible, location_real,
+      employment_type, compensation_min, compensation_max,
+      compensation_currency, compensation_period, posted_at, apply_url,
+      raw: line,
+    });
   }
   return out;
 }

@@ -224,6 +224,63 @@ function loadSeenCompanyRoles() {
 
 // ── Pipeline writer ─────────────────────────────────────────────────
 
+// Tier compute helper for pipeline.md serialization (avoids importing
+// classify-work-mode.mjs here; we accept job.tier if pre-computed by caller,
+// otherwise leave the T= token off).
+const VALID_TIERS = new Set([1, 2, 3, 4]);
+const VALID_WORK_MODES = new Set(['REMOTE', 'HYBRID', 'ON_SITE', 'UNKNOWN']);
+const VALID_BR_ELIGIBLE = new Set(['BR_OK', 'RELOCATION_REQUIRED', 'UNKNOWN']);
+const VALID_EMPLOYMENT_TYPES = new Set(['FULL_TIME', 'PART_TIME', 'CONTRACT', 'INTERN', 'TEMPORARY', 'UNKNOWN']);
+const VALID_COMP_PERIODS = new Set(['HOUR', 'DAY', 'WEEK', 'MONTH', 'YEAR', 'UNKNOWN']);
+
+/**
+ * Format a Job object as a single pipeline.md line.
+ *
+ * Format: `- [ ] url | company | title[ | v2.0 metadata[ | v2.1 metadata]]`
+ *
+ * - v2.0 block (pipe 3) is written iff (work_mode || br_eligible || tier
+ *   || location_real) is present — i.e. provider populated at least one v2
+ *   field.
+ * - v2.1 block (pipe 4) is written iff (employment_type || compensation_min
+ *   || compensation_max || compensation_currency || compensation_period
+ *   || posted_at || apply_url) is present.
+ * - Tokens within each block are space-separated; absent tokens are omitted
+ *   (not written as `key=`).
+ *
+ * Backward compat: v1 / v2.0 parsers reading 3 / 4 pipes silently ignore the
+ * extra blocks.
+ *
+ * @param {object} o — Job + source-tagged offer
+ * @returns {string}
+ */
+function formatPipelineLine(o) {
+  const head = `- [ ] ${o.url} | ${o.company} | ${o.title}`;
+  // v2.0 block
+  const v2Tokens = [];
+  if (VALID_TIERS.has(o.tier)) v2Tokens.push(`T=${o.tier}`);
+  if (VALID_WORK_MODES.has(o.work_mode)) v2Tokens.push(`wm=${o.work_mode}`);
+  if (VALID_BR_ELIGIBLE.has(o.br_eligible)) v2Tokens.push(`br=${o.br_eligible}`);
+  if (typeof o.location_real === 'string' && o.location_real.trim()) v2Tokens.push(`loc=${o.location_real.trim()}`);
+  // v2.1 block
+  const v21Tokens = [];
+  if (VALID_EMPLOYMENT_TYPES.has(o.employment_type)) v21Tokens.push(`et=${o.employment_type}`);
+  if (Number.isFinite(o.compensation_min)) v21Tokens.push(`cmin=${o.compensation_min}`);
+  if (Number.isFinite(o.compensation_max)) v21Tokens.push(`cmax=${o.compensation_max}`);
+  if (typeof o.compensation_currency === 'string' && /^[A-Z]{3}$/.test(o.compensation_currency)) v21Tokens.push(`ccy=${o.compensation_currency}`);
+  if (VALID_COMP_PERIODS.has(o.compensation_period)) v21Tokens.push(`cper=${o.compensation_period}`);
+  if (typeof o.posted_at === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(o.posted_at)) v21Tokens.push(`posted=${o.posted_at}`);
+  if (typeof o.apply_url === 'string' && /^https?:\/\//.test(o.apply_url) && o.apply_url !== o.url) v21Tokens.push(`apply=${o.apply_url}`);
+  let line = head;
+  if (v2Tokens.length > 0) line += ` | ${v2Tokens.join(' ')}`;
+  // Pad with empty pipe-3 if v2.1 has tokens but v2.0 doesn't — keeps
+  // positional parsing intact (parts[3]=v2.0, parts[4]=v2.1).
+  if (v21Tokens.length > 0) {
+    if (v2Tokens.length === 0) line += ' |';
+    line += ` | ${v21Tokens.join(' ')}`;
+  }
+  return line;
+}
+
 function appendToPipeline(offers) {
   if (offers.length === 0) return;
 
@@ -236,9 +293,7 @@ function appendToPipeline(offers) {
     // No Pendientes section — append at end before Procesadas
     const procIdx = text.indexOf('## Procesadas');
     const insertAt = procIdx === -1 ? text.length : procIdx;
-    const block = `\n${marker}\n\n` + offers.map(o =>
-      `- [ ] ${o.url} | ${o.company} | ${o.title}`
-    ).join('\n') + '\n\n';
+    const block = `\n${marker}\n\n` + offers.map(formatPipelineLine).join('\n') + '\n\n';
     text = text.slice(0, insertAt) + block + text.slice(insertAt);
   } else {
     // Find the end of existing Pendientes content (next ## or end)
@@ -246,14 +301,14 @@ function appendToPipeline(offers) {
     const nextSection = text.indexOf('\n## ', afterMarker);
     const insertAt = nextSection === -1 ? text.length : nextSection;
 
-    const block = '\n' + offers.map(o =>
-      `- [ ] ${o.url} | ${o.company} | ${o.title}`
-    ).join('\n') + '\n';
+    const block = '\n' + offers.map(formatPipelineLine).join('\n') + '\n';
     text = text.slice(0, insertAt) + block + text.slice(insertAt);
   }
 
   writeFileSync(PIPELINE_PATH, text, 'utf-8');
 }
+
+export { formatPipelineLine };
 
 function appendToScanHistory(offers, date, status = 'added') {
   // Ensure file + header exist. Location appended as 7th column for non-breaking

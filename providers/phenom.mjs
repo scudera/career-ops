@@ -170,6 +170,10 @@ function extractFromXml(xml, host, company, filter) {
       work_mode: /** @type {'UNKNOWN'} */ ('UNKNOWN'),
       br_eligible: /** @type {'UNKNOWN'} */ ('UNKNOWN'),
       location_real: '',
+      // v2.1 (COTSK-7): Phenom sitemap layer também não expõe
+      // employment_type/compensation/posted_at/apply_url. Pre-apply-check
+      // pode resolver via JSON-LD JobPosting parse na enrich step (já roda
+      // classifyFromHtml na URL ACTIVE). v2.1 fields aqui = undefined.
     });
   }
   return out;

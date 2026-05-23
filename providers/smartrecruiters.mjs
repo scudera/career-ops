@@ -26,7 +26,11 @@
 // RELOCATION_REQUIRED for ON_SITE/HYBRID, UNKNOWN-friendly for REMOTE).
 // Standby — no portals.yml entries today; method documented for activation.
 
-import { brEligibleFromStructuredLocation } from '../classify-work-mode.mjs';
+import {
+  brEligibleFromStructuredLocation,
+  employmentTypeFromEnum,
+  truncateDateISO,
+} from '../classify-work-mode.mjs';
 
 const SR_API_BASE = 'https://api.smartrecruiters.com/v1/companies';
 const SR_JOBS_BASE = 'https://jobs.smartrecruiters.com';
@@ -123,7 +127,13 @@ async function fetch(entry, ctx) {
         work_mode,
       );
       const locationFmt = formatLocation(loc);
-      out.push({
+      // v2.1: SmartRec API expõe j.typeOfEmployment.id (full-time/part-time/etc)
+      // e j.releasedDate (ISO). Compensation + apply_url raramente preenchidos
+      // no plano free do SmartRec API; deixar undefined quando ausente.
+      const employment_type = employmentTypeFromEnum(j?.typeOfEmployment?.id || j?.typeOfEmployment?.label || '');
+      const posted_at = j?.releasedDate ? truncateDateISO(String(j.releasedDate)) : undefined;
+      /** @type {Job} */
+      const jobOut = {
         title,
         url: `${SR_JOBS_BASE}/${slug}/${id}`,
         company,
@@ -131,7 +141,10 @@ async function fetch(entry, ctx) {
         work_mode,
         br_eligible,
         location_real: locationFmt,
-      });
+      };
+      if (employment_type) jobOut.employment_type = employment_type;
+      if (posted_at) jobOut.posted_at = posted_at;
+      out.push(jobOut);
     }
 
     offset += items.length;

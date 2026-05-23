@@ -6,6 +6,8 @@
 /** @typedef {import('./_types.js').WorkMode} WorkMode */
 /** @typedef {import('./_types.js').BrEligible} BrEligible */
 
+import { parseWorkdayPostedOn } from '../classify-work-mode.mjs';
+
 // Workday provider — hits the public CXS jobs endpoint via POST.
 // Auto-detects from careers_url pattern `https://{tenant}.{shard}.myworkdayjobs.com/{site}`.
 //
@@ -267,7 +269,13 @@ async function paginateLeaf(endpoint, baseDisplay, company, searchText, appliedF
       if (!posting?.title || !posting?.externalPath) continue;
       const locationsText = String(posting.locationsText || '');
       const inferred = inferModeFromLocation(locationsText);
-      jobs.push({
+      // v2.1: Workday list API exposes `postedOn` as human string ("Posted N
+      // Days Ago" / "Posted Today" / "Posted Yesterday"). Parse to YYYY-MM-DD.
+      // Other v2.1 fields (employment_type, compensation, apply_url) NOT
+      // available at list level — would require per-job CXS detail fetch.
+      const posted_at = posting?.postedOn ? parseWorkdayPostedOn(String(posting.postedOn)) : undefined;
+      /** @type {Job} */
+      const job = {
         title: String(posting.title),
         url: baseDisplay + String(posting.externalPath),
         company,
@@ -275,7 +283,9 @@ async function paginateLeaf(endpoint, baseDisplay, company, searchText, appliedF
         work_mode: inferred.work_mode,
         br_eligible: inferred.br_eligible,
         location_real: locationsText,
-      });
+      };
+      if (posted_at) job.posted_at = posted_at;
+      jobs.push(job);
     }
     if (total === null && typeof data.total === 'number' && data.total > 0) total = data.total;
     offset += PAGE_SIZE;

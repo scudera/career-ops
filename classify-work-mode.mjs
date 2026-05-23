@@ -352,6 +352,146 @@ export function brEligibleFromStructuredLocation(loc, work_mode) {
  * @param {{minStableMs?: number, maxWaitMs?: number, pollMs?: number}} [opts]
  * @returns {Promise<{stable: boolean, waitedMs: number, finalLen: number}>}
  */
+// ── Schema v2.1 helpers (COTSK-7 23/may/26) ─────────────────────────────
+
+/** @typedef {('FULL_TIME'|'PART_TIME'|'CONTRACT'|'INTERN'|'TEMPORARY'|'UNKNOWN')} EmploymentType */
+/** @typedef {('HOUR'|'DAY'|'WEEK'|'MONTH'|'YEAR'|'UNKNOWN')} CompensationPeriod */
+
+const EMPLOYMENT_TYPE_VALUES = new Set(['FULL_TIME', 'PART_TIME', 'CONTRACT', 'INTERN', 'TEMPORARY', 'UNKNOWN']);
+const COMPENSATION_PERIOD_VALUES = new Set(['HOUR', 'DAY', 'WEEK', 'MONTH', 'YEAR', 'UNKNOWN']);
+
+/**
+ * Normalize a provider-native employment-type string to the v2.1 closed enum.
+ * Returns undefined when the input doesn't map to any known value (so the
+ * field is omitted from pipeline.md rather than written as UNKNOWN — preserves
+ * "absent vs explicitly unknown" distinction).
+ *
+ * Mapping table:
+ *   Workday timeType:     "Full time" → FULL_TIME, "Part time" → PART_TIME
+ *   Gupy type:            "effective" → FULL_TIME, "intern"/"trainee" → INTERN, "temporary" → TEMPORARY
+ *   Workable employment:  "full-time" → FULL_TIME, "part-time" → PART_TIME, "contract" → CONTRACT,
+ *                         "internship" → INTERN, "temporary" → TEMPORARY
+ *   Phenom JSON-LD:       Schema.org enums FULL_TIME/PART_TIME/CONTRACTOR/TEMPORARY/INTERN passthrough,
+ *                         VOLUNTEER/PER_DIEM/OTHER → UNKNOWN
+ *   SmartRec typeOfEmp:   "full-time"/"part-time"/"contract"/"intern" mapping same as Workable
+ *
+ * @param {string} raw
+ * @returns {EmploymentType|undefined}
+ */
+export function employmentTypeFromEnum(raw) {
+  if (typeof raw !== 'string') return undefined;
+  const t = raw.trim().toLowerCase().replace(/[\s_-]+/g, '-');
+  if (!t) return undefined;
+  if (/^full-?time$/.test(t) || t === 'effective' || t === 'permanent') return 'FULL_TIME';
+  if (/^part-?time$/.test(t)) return 'PART_TIME';
+  if (t === 'contract' || t === 'contractor' || t === 'freelance') return 'CONTRACT';
+  if (t === 'intern' || t === 'internship' || t === 'trainee') return 'INTERN';
+  if (t === 'temporary' || t === 'temp' || t === 'fixed-term' || t === 'fixedterm') return 'TEMPORARY';
+  if (t === 'volunteer' || t === 'per-diem' || t === 'other') return 'UNKNOWN';
+  return undefined;
+}
+
+/**
+ * Normalize compensation period string (per Workable / Phenom JSON-LD unitText).
+ *
+ * @param {string} raw
+ * @returns {CompensationPeriod|undefined}
+ */
+export function compensationPeriodFromEnum(raw) {
+  if (typeof raw !== 'string') return undefined;
+  const t = raw.trim().toUpperCase();
+  if (!t) return undefined;
+  if (t === 'HOUR' || t === 'HOURLY') return 'HOUR';
+  if (t === 'DAY' || t === 'DAILY') return 'DAY';
+  if (t === 'WEEK' || t === 'WEEKLY') return 'WEEK';
+  if (t === 'MONTH' || t === 'MONTHLY') return 'MONTH';
+  if (t === 'YEAR' || t === 'YEARLY' || t === 'ANNUAL' || t === 'ANNUALLY') return 'YEAR';
+  return undefined;
+}
+
+/**
+ * Workday CXS list API returns `postedOn` as a human string like
+ * "Posted 9 Days Ago", "Posted Today", "Posted Yesterday", "Posted 30+ Days Ago".
+ * Parse back to YYYY-MM-DD (relative to `today`). On unrecognized format,
+ * returns undefined.
+ *
+ * @param {string} raw
+ * @param {Date} [today]
+ * @returns {string|undefined}
+ */
+export function parseWorkdayPostedOn(raw, today = new Date()) {
+  if (typeof raw !== 'string') return undefined;
+  const s = raw.trim().toLowerCase();
+  if (!s) return undefined;
+  let daysAgo = NaN;
+  if (/posted\s+today/.test(s) || s === 'today') daysAgo = 0;
+  else if (/posted\s+yesterday/.test(s) || s === 'yesterday') daysAgo = 1;
+  else {
+    const m = s.match(/posted\s+(\d+)\+?\s*days?\s+ago/);
+    if (m) daysAgo = parseInt(m[1], 10);
+  }
+  if (!Number.isFinite(daysAgo) || daysAgo < 0) return undefined;
+  const d = new Date(today);
+  d.setDate(d.getDate() - daysAgo);
+  return d.toISOString().slice(0, 10);
+}
+
+/**
+ * Truncate an ISO timestamp (or any string starting with YYYY-MM-DD) to
+ * date-only. Returns undefined if input doesn't start with a valid date.
+ *
+ * @param {string} raw
+ * @returns {string|undefined}
+ */
+export function truncateDateISO(raw) {
+  if (typeof raw !== 'string') return undefined;
+  const m = raw.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return undefined;
+  return `${m[1]}-${m[2]}-${m[3]}`;
+}
+
+/**
+ * Validate that a string parses cleanly as an absolute URL. Returns the URL
+ * unchanged on success, undefined otherwise. Used by v2.1 apply_url field
+ * — we only persist URLs that actually parse.
+ *
+ * @param {string} raw
+ * @returns {string|undefined}
+ */
+export function asAbsoluteUrl(raw) {
+  if (typeof raw !== 'string') return undefined;
+  try {
+    const u = new URL(raw);
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') return undefined;
+    return raw;
+  } catch {
+    return undefined;
+  }
+}
+
+/**
+ * Validate employment_type enum membership at parse-time. Returns undefined
+ * for non-conformant values (consistent with v2.0 "don't silently coerce").
+ *
+ * @param {string} raw
+ * @returns {EmploymentType|undefined}
+ */
+export function validateEmploymentType(raw) {
+  if (typeof raw !== 'string') return undefined;
+  return /** @type {any} */ (EMPLOYMENT_TYPE_VALUES.has(raw)) ? /** @type {EmploymentType} */ (raw) : undefined;
+}
+
+/**
+ * Validate compensation_period enum membership.
+ *
+ * @param {string} raw
+ * @returns {CompensationPeriod|undefined}
+ */
+export function validateCompensationPeriod(raw) {
+  if (typeof raw !== 'string') return undefined;
+  return /** @type {any} */ (COMPENSATION_PERIOD_VALUES.has(raw)) ? /** @type {CompensationPeriod} */ (raw) : undefined;
+}
+
 /**
  * URL signatures of Phenom-based career sites. Used by the CP3.5 Fase B
  * defensive rule (Phenom Brazil placeholder fallback). Stable as of 2026-05.

@@ -12,7 +12,14 @@
 // boolean + `workplace` string (when present). Mapped via
 // classify-work-mode::workModeFromEnum + brEligibleFromStructuredLocation.
 
-import { workModeFromEnum, brEligibleFromStructuredLocation } from '../classify-work-mode.mjs';
+import {
+  workModeFromEnum,
+  brEligibleFromStructuredLocation,
+  employmentTypeFromEnum,
+  truncateDateISO,
+  asAbsoluteUrl,
+  compensationPeriodFromEnum,
+} from '../classify-work-mode.mjs';
 
 const WORKABLE_HOST = 'apply.workable.com';
 const WORKABLE_API_BASE = `https://${WORKABLE_HOST}/api/v1/widget/accounts`;
@@ -74,15 +81,37 @@ const provider = {
         const loc = { city: j?.city || '', region: j?.region || '', country: j?.country || '', fullLocation: '' };
         const br_eligible = brEligibleFromStructuredLocation(loc, work_mode);
         const locationFmt = formatLocation(j);
-        return {
+        const url = String(j.shortlink || j.url);
+        // v2.1: Workable API expõe j.employment_type, j.published_on (ISO),
+        // j.salary {min, max, currency, period}, j.application_url. Todos
+        // opcionais; alguns tenants não preenchem salary/application_url.
+        const employment_type = employmentTypeFromEnum(j?.employment_type || '');
+        const posted_at = j?.published_on ? truncateDateISO(String(j.published_on)) : undefined;
+        const sal = j?.salary || {};
+        const compensation_min = Number.isFinite(sal.min) ? sal.min : undefined;
+        const compensation_max = Number.isFinite(sal.max) ? sal.max : undefined;
+        const compensation_currency = typeof sal.currency === 'string' && sal.currency.trim() ? sal.currency.trim().toUpperCase() : undefined;
+        const compensation_period = compensationPeriodFromEnum(sal.period || sal.unit || '');
+        const apply_candidate = j?.application_url || j?.apply_url;
+        const apply_url = (apply_candidate && apply_candidate !== url) ? asAbsoluteUrl(String(apply_candidate)) : undefined;
+        /** @type {Job} */
+        const job = {
           title: String(j.title),
-          url: String(j.shortlink || j.url),
+          url,
           company,
           location: locationFmt,
           work_mode,
           br_eligible,
           location_real: locationFmt,
         };
+        if (employment_type) job.employment_type = employment_type;
+        if (compensation_min !== undefined) job.compensation_min = compensation_min;
+        if (compensation_max !== undefined) job.compensation_max = compensation_max;
+        if (compensation_currency) job.compensation_currency = compensation_currency;
+        if (compensation_period) job.compensation_period = compensation_period;
+        if (posted_at) job.posted_at = posted_at;
+        if (apply_url) job.apply_url = apply_url;
+        return job;
       });
   },
 };

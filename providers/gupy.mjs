@@ -9,7 +9,7 @@
 // Tenant subdomain implies BR base → br_eligible defaults BR_OK; remote-only
 // portals (rare) would still be BR_OK since Gupy hosts Brazilian companies.
 
-import { workModeFromEnum, brEligibleFromStructuredLocation } from '../classify-work-mode.mjs';
+import { workModeFromEnum, brEligibleFromStructuredLocation, employmentTypeFromEnum, truncateDateISO } from '../classify-work-mode.mjs';
 
 // Gupy BR provider — Next.js __NEXT_DATA__ SSR extraction.
 //
@@ -145,7 +145,13 @@ async function fetch(entry, ctx) {
     };
     const br_eligible = brEligibleFromStructuredLocation(locForBR, work_mode);
     const locationFmt = formatLocation(j?.workplace);
-    out.push({
+    // v2.1: Gupy NEXT_DATA expõe `type` (effective/intern/trainee/temporary)
+    // e `publishedDate` (ISO timestamp). Sem compensation/apply_url no payload
+    // typical BR. Both fields opcional — undefined quando ausente.
+    const employment_type = employmentTypeFromEnum(j?.type || '');
+    const posted_at = j?.publishedDate ? truncateDateISO(String(j.publishedDate)) : undefined;
+    /** @type {Job} */
+    const job = {
       title,
       url,
       company,
@@ -153,7 +159,10 @@ async function fetch(entry, ctx) {
       work_mode,
       br_eligible,
       location_real: locationFmt,
-    });
+    };
+    if (employment_type) job.employment_type = employment_type;
+    if (posted_at) job.posted_at = posted_at;
+    out.push(job);
   }
   return out;
 }

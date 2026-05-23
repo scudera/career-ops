@@ -30,6 +30,10 @@ const APPLY_PATTERNS = [
   /\bsolicitar\b/i,
   /\bbewerben\b/i,
   /\bpostuler\b/i,
+  // PT-BR (Gupy + other BR portals). CP5/COTSK-6: Gupy renders Apply as
+  // "Candidatar-se" / "Candidatar-me" — was the entire 3/12 FAIL in CP4 smoke.
+  /\bcandidatar\b/i,
+  /\bcandidatura\b/i,
   /submit application/i,
   /easy apply/i,
   /start application/i,

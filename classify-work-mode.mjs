@@ -72,7 +72,38 @@ export function stripHtmlComments(raw) {
 }
 
 /**
- * Extract all JSON-LD JobPosting blocks from HTML.
+ * Lenient JSON parse fallback for legacy site formats. Strict parse should
+ * always be attempted first; this only runs when strict fails. Handles:
+ *   - Trailing commas before } or ]:   `{"a": 1,}` → `{"a": 1}`
+ *   - JS-style block comments inline:  `{"a": 1 /* x */}` → `{"a": 1 }`
+ *   - JS-style line comments inline:   `{"a": 1 // x\n}` → `{"a": 1 \n}`
+ *
+ * Single-quote keys/strings are intentionally NOT auto-converted — too risky
+ * without a full tokenizer (would corrupt apostrophes inside legitimate
+ * string content). Lenient parse logs a WARN to stderr when it activates so
+ * we can audit which sites need cleanup.
+ *
+ * @param {string} raw
+ * @returns {object|null}
+ */
+export function lenientJsonParse(raw) {
+  if (typeof raw !== 'string') return null;
+  let s = raw;
+  s = s.replace(/\/\*[\s\S]*?\*\//g, '');
+  s = s.replace(/(^|[^:])\/\/[^\n]*/g, '$1');
+  s = s.replace(/,(\s*[}\]])/g, '$1');
+  try {
+    return JSON.parse(s);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Extract all JSON-LD JobPosting blocks from HTML. Strict JSON.parse is the
+ * happy path; on failure we try lenientJsonParse and log a WARN. Blocks that
+ * fail both strict + lenient are dropped (and logged) — same as before, just
+ * no longer silent.
  *
  * @param {string} html
  * @returns {Array<object>}
@@ -83,13 +114,19 @@ export function extractJsonLdBlocks(html) {
   let m;
   while ((m = re.exec(html)) !== null) {
     const payload = stripHtmlComments(m[1]);
+    let parsed = null;
     try {
-      const parsed = JSON.parse(payload);
-      if (Array.isArray(parsed)) out.push(...parsed);
-      else out.push(parsed);
+      parsed = JSON.parse(payload);
     } catch {
-      /* skip malformed */
+      parsed = lenientJsonParse(payload);
+      if (parsed === null) {
+        process.stderr.write(`[classify-work-mode] WARN: JSON-LD block failed strict + lenient parse (${payload.length} chars)\n`);
+        continue;
+      }
+      process.stderr.write(`[classify-work-mode] WARN: JSON-LD block recovered via lenient parse (${payload.length} chars)\n`);
     }
+    if (Array.isArray(parsed)) out.push(...parsed);
+    else if (parsed && typeof parsed === 'object') out.push(parsed);
   }
   return out;
 }

@@ -42,13 +42,13 @@ Sessão 22/may/26 expôs 3 gaps no schema v1:
 | tier | regra | semântica |
 |---|---|---|
 | 1 | REMOTE + BR_OK | best fit — full remote BR-resident accepted |
-| 2 | (HYBRID + BR_OK) OR (REMOTE + non-RELOCATION) | BR híbrido OU remote EU c/ BR_OK |
-| 3 | (ON_SITE + BR_OK) OR (HYBRID + UNKNOWN br_eligible) OR (UNKNOWN + BR_OK) | BR on-site OU pre-resolution ambiguous BR |
+| 2 | HYBRID + BR_OK | BR híbrido / remote EU validado c/ BR_OK |
+| 3 | (ON_SITE + BR_OK) OR (HYBRID + UNKNOWN br_eligible) OR (UNKNOWN + BR_OK) OR (REMOTE + UNKNOWN br_eligible) | BR on-site OU pre-resolution ambiguous |
 | 4 | RELOCATION_REQUIRED OR ON_SITE non-BR | descartar (Vitor policy: relocação não é goal) |
 
 **Edge case explícito:** `UNKNOWN work_mode + BR_OK br_eligible` → Tier 3 (advisor fix 22/may — fallback default era Tier 4, agora coberto).
 
-**Edge case em aberto (CP2 decision required):** `REMOTE + UNKNOWN br_eligible` cai em Tier 2 pela regra atual, mas semanticamente arriscado — para ATSes sem JSON-LD (ex: LinkedIn), "remote" no body pode ser US-only / country-restricted que o classifier não detectou. Smoke CP1 expôs: ICON LinkedIn Sr Manager classificou T=2 wm=REMOTE br=UNKNOWN sem JSON-LD country signal. CP2 deve decidir: (a) bump REMOTE+UNKNOWN para Tier 3, OR (b) manter Tier 2 com flag `verify-required=true` no metadata.
+**Edge case resolved (CP1 sign-off → CP2):** `REMOTE + UNKNOWN br_eligible` → **Tier 3** (não Tier 2). Conservative — não inflar Tier 2 com falso-positivos de ATSes sem JSON-LD (ex: LinkedIn body match "remote" pode ser US-only / country-restricted). Pre-apply-enrich em CP3 resolve UNKNOWN via JD fetch profundo e promove pra Tier 1/2/4 conforme dado real. Sem campo `verify_required` no schema — UNKNOWN é signal suficiente.
 
 ### `location_real` — endereço canonical do JD
 

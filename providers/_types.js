@@ -12,12 +12,24 @@
 /**
  * Normalized job posting — the unit of currency throughout the scanner.
  *
+ * Schema v2 (CP2 22/may/26): added `work_mode`, `br_eligible`, `location_real`.
+ * Providers that can extract these natively (Gupy `workplaceType`, Workable
+ * `workplace_type`, Workday `applicantLocationRequirements`) populate them.
+ * Providers without native signal (Phenom, SmartRec list pages, LinkedIn)
+ * leave them undefined or set to 'UNKNOWN' — `filter-candidates.mjs` and the
+ * pre-apply-check enrich step resolve them downstream.
+ *
+ * @typedef {('REMOTE'|'HYBRID'|'ON_SITE'|'UNKNOWN')} WorkMode
+ * @typedef {('BR_OK'|'RELOCATION_REQUIRED'|'UNKNOWN')} BrEligible
+ *
  * @typedef {object} Job
- * @property {string} title    Required, non-empty after trim.
- * @property {string} url      Required, absolute URL — used as the dedup key.
- * @property {string} company  May be empty when the source can't expose it
- *                             at the list-page level; populated downstream.
- * @property {string} location May be empty.
+ * @property {string}      title          Required, non-empty after trim.
+ * @property {string}      url            Required, absolute URL — used as the dedup key.
+ * @property {string}      company        May be empty when source can't expose it.
+ * @property {string}      location       Free-form location label (legacy v1 field; may differ from JD).
+ * @property {WorkMode}    [work_mode]    v2 — when provider can extract natively.
+ * @property {BrEligible}  [br_eligible]  v2 — when provider can determine.
+ * @property {string}      [location_real] v2 — canonical address from JD when known.
  */
 
 /**

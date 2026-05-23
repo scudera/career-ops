@@ -15,6 +15,18 @@
 //
 // Coverage in current portals.yml is low/none; provider added so new
 // SR-hosted tenants discovered later can be wired with one entry.
+//
+// Schema v2 (CP2 22/may/26): SR posting object exposes `location.remote`
+// and `location.hybrid` booleans (already used by formatLocation). Mapping
+// to canonical WorkMode:
+//   - location.remote === true  → REMOTE
+//   - location.hybrid === true  → HYBRID
+//   - both false                → ON_SITE (assumed by SR convention)
+// br_eligible inferred from location.country (Brazil → BR_OK, else
+// RELOCATION_REQUIRED for ON_SITE/HYBRID, UNKNOWN-friendly for REMOTE).
+// Standby — no portals.yml entries today; method documented for activation.
+
+import { brEligibleFromStructuredLocation } from '../classify-work-mode.mjs';
 
 const SR_API_BASE = 'https://api.smartrecruiters.com/v1/companies';
 const SR_JOBS_BASE = 'https://jobs.smartrecruiters.com';
@@ -100,11 +112,25 @@ async function fetch(entry, ctx) {
       const id = j?.id;
       if (!title || !id) continue;
       if (remoteOnly && j?.location?.remote !== true) continue;
+      const loc = j?.location || {};
+      /** @type {'REMOTE'|'HYBRID'|'ON_SITE'|'UNKNOWN'} */
+      let work_mode = 'UNKNOWN';
+      if (loc.remote === true) work_mode = 'REMOTE';
+      else if (loc.hybrid === true) work_mode = 'HYBRID';
+      else if (loc.city || loc.country) work_mode = 'ON_SITE';
+      const br_eligible = brEligibleFromStructuredLocation(
+        { city: loc.city, region: loc.region, country: loc.country, fullLocation: loc.fullLocation },
+        work_mode,
+      );
+      const locationFmt = formatLocation(loc);
       out.push({
         title,
         url: `${SR_JOBS_BASE}/${slug}/${id}`,
         company,
-        location: formatLocation(j?.location),
+        location: locationFmt,
+        work_mode,
+        br_eligible,
+        location_real: locationFmt,
       });
     }
 

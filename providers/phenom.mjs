@@ -163,6 +163,13 @@ function extractFromXml(xml, host, company, filter) {
       // Phenom sitemap doesn't expose location at this layer; downstream
       // pre-apply-check / liveness pass can scrape per-job pages if needed.
       location: '',
+      // Schema v2 (CP2 22/may/26): sitemap layer has no work_mode signal.
+      // Marked UNKNOWN — pre-apply-check enrich (CP3) resolves via inspect-jds
+      // for entries that survive title filter. Avoids 100 blind fetches per
+      // tenant (Risk #3 decision).
+      work_mode: /** @type {'UNKNOWN'} */ ('UNKNOWN'),
+      br_eligible: /** @type {'UNKNOWN'} */ ('UNKNOWN'),
+      location_real: '',
     });
   }
   return out;

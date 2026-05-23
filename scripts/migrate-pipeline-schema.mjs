@@ -3,20 +3,25 @@
 /**
  * migrate-pipeline-schema.mjs — non-destructive migration v1 → v2.
  *
- * Reads data/pipeline.md (v1), re-classifies each `- [ ]` entry via
- * scripts/inspect-jds.mjs subprocess, and writes data/pipeline-v2.md with
- * the v2 metadata appended as a 4th pipe-delimited field:
+ * Reads data/pipeline.md (v1), re-classifies each `- [ ]` entry via the
+ * shared classify-work-mode + playwright inspect pipeline, writes
+ * data/pipeline-v2.md with the v2 metadata appended as a 4th pipe-delimited
+ * field:
  *
  *   - [ ] URL | Company | Title | T=N wm=WM br=BR loc=LOC
  *
  * Original pipeline.md is preserved untouched.
  *
+ * CP2 update: switched from subprocess invocation of inspect-jds.mjs to
+ * direct import (`inspectMany` from ../scripts/inspect-jds.mjs), reusing
+ * one browser context across all URLs. Faster + cleaner error handling.
+ *
  * USAGE:
- *   node scripts/migrate-pipeline-schema.mjs [--limit N] [--unchecked-only]
+ *   node scripts/migrate-pipeline-schema.mjs [--limit N] [--all-states]
  *
  * FLAGS:
- *   --limit N         Cap to first N unchecked entries (default: all)
- *   --unchecked-only  Skip entries that are already checked (default: true)
+ *   --limit=N      Cap to first N unchecked entries (default: all)
+ *   --all-states   Include already-checked entries (default: unchecked only)
  *
  * EXIT:
  *   0 success
@@ -24,21 +29,19 @@
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
-import { spawn } from 'node:child_process';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { inspectMany } from './inspect-jds.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..');
 const PIPELINE_IN = join(REPO_ROOT, 'data', 'pipeline.md');
 const PIPELINE_OUT = join(REPO_ROOT, 'data', 'pipeline-v2.md');
-const INSPECT_JDS = join(REPO_ROOT, 'scripts', 'inspect-jds.mjs');
 
 const ENTRY_RE = /^- \[([ x])\] (.+)$/;
 const URL_RE = /https?:\/\/[^\s|]+/;
 
 /**
- * Parse a pipeline.md entry line into URL + remainder.
  * @param {string} line
  */
 function parseEntry(line) {
@@ -52,73 +55,7 @@ function parseEntry(line) {
 }
 
 /**
- * Spawn inspect-jds.mjs with N URLs via --stdin, parse markdown table back.
- * Returns Map<url, {tier, work_mode, br_eligible, location_real, evidence}>.
- *
- * @param {string[]} urls
- * @returns {Promise<Map<string, object>>}
- */
-async function classifyUrls(urls) {
-  return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [INSPECT_JDS, '--stdin'], {
-      env: { ...process.env, NODE_OPTIONS: '--use-system-ca' },
-      stdio: ['pipe', 'pipe', 'inherit'],
-    });
-    let stdout = '';
-    child.stdout.on('data', (chunk) => { stdout += chunk.toString('utf8'); });
-    child.on('error', reject);
-    child.on('close', (code) => {
-      if (code !== 0) return reject(new Error(`inspect-jds exit ${code}`));
-      resolve(parseInspectOutput(stdout));
-    });
-    child.stdin.write(urls.join('\n') + '\n');
-    child.stdin.end();
-  });
-}
-
-/**
- * Parse inspect-jds markdown table output back into per-URL records.
- * Table columns: tier | work_mode | br_eligible | location_real | url | evidence
- * URLs are truncated in display ("...") so we match URLs by prefix from input.
- *
- * @param {string} stdout
- * @returns {Map<string, object>}
- */
-function parseInspectOutput(stdout) {
-  const out = new Map();
-  const lines = stdout.split(/\r?\n/);
-  for (const ln of lines) {
-    if (!ln.startsWith('| ')) continue;
-    if (/^\|\s*tier\s*\|/i.test(ln)) continue;
-    if (/^\|\s*-+\s*\|/.test(ln)) continue;
-    // Parse cells (split by ' | ' avoids breaking on inner '|')
-    const cells = ln.slice(1, -1).split(' | ').map((s) => s.trim());
-    if (cells.length !== 6) continue; // strict — inspect-jds escapes inner | so 6 cells exact
-    const [tierStr, work_mode, br_eligible, location_real, urlDisp, evidence] = cells;
-    const tier = parseInt(tierStr.replace(/[^\d]/g, ''), 10);
-    if (!Number.isFinite(tier)) continue;
-    // urlDisp may be truncated with '...' — match later by prefix
-    out.set(urlDisp, { tier, work_mode, br_eligible, location_real, evidence, urlDisp });
-  }
-  return out;
-}
-
-/**
- * Resolve full URL by matching display prefix.
- * @param {string} fullUrl
- * @param {Map<string, object>} classified
- */
-function resolveClassification(fullUrl, classified) {
-  for (const [disp, rec] of classified.entries()) {
-    const prefix = disp.replace(/\.\.\.$/, '');
-    if (fullUrl.startsWith(prefix) || fullUrl === disp) return rec;
-  }
-  return null;
-}
-
-/**
- * Build the v2 metadata suffix: "T=N wm=WM br=BR loc=LOC".
- * @param {object} rec
+ * @param {{tier: number, work_mode: string, br_eligible: string, location_real: string}} rec
  */
 function buildSuffix(rec) {
   const loc = (rec.location_real || '').replace(/\|/g, '/').slice(0, 120);
@@ -150,36 +87,27 @@ async function main() {
   }
 
   const urls = targets.map((t) => t.url);
-  console.error(`Spawning inspect-jds.mjs for ${urls.length} URLs (sequential internally, ~15s each)...`);
-  const classified = await classifyUrls(urls);
-  console.error(`Got ${classified.size} classifications back.`);
+  const results = await inspectMany(urls);
 
-  // Build output: rewrite only target lines with v2 suffix
+  // Map URL → result. inspectMany preserves order, so we can zip.
+  const byUrl = new Map();
+  for (let i = 0; i < urls.length; i++) byUrl.set(urls[i], results[i]);
+
   const outLines = inLines.slice();
   let classifiedCount = 0;
   const tierCounts = { 1: 0, 2: 0, 3: 0, 4: 0 };
   const wmCounts = { REMOTE: 0, HYBRID: 0, ON_SITE: 0, UNKNOWN: 0 };
 
   for (const t of targets) {
-    const rec = resolveClassification(t.url, classified);
-    if (!rec) {
-      console.error(`  ⚠️  no classification matched for ${t.url.slice(0, 80)}`);
+    const rec = byUrl.get(t.url);
+    if (!rec || rec.error) {
+      console.error(`  ⚠️  classification failed for ${t.url.slice(0, 80)}: ${rec?.error || 'no result'}`);
       continue;
     }
     classifiedCount++;
-    tierCounts[rec.tier] = (tierCounts[rec.tier] || 0) + 1;
-    wmCounts[rec.work_mode] = (wmCounts[rec.work_mode] || 0) + 1;
-    // Append v2 suffix to original line (preserve checkbox + existing pipes)
-    const line = inLines[t.idx];
-    // If line already has 4+ pipes (v2 already present), replace last field
-    const pipeCount = (line.match(/\|/g) || []).length;
-    const suffix = buildSuffix(rec);
-    if (pipeCount >= 3) {
-      // already has 3 pipes (URL|Company|Title) — append 4th
-      outLines[t.idx] = `${line} | ${suffix}`;
-    } else {
-      outLines[t.idx] = `${line} | ${suffix}`;
-    }
+    tierCounts[/** @type {1|2|3|4} */ (rec.tier)] = (tierCounts[rec.tier] || 0) + 1;
+    wmCounts[/** @type {keyof typeof wmCounts} */ (rec.work_mode)] = (wmCounts[rec.work_mode] || 0) + 1;
+    outLines[t.idx] = `${inLines[t.idx]} | ${buildSuffix(rec)}`;
   }
 
   writeFileSync(PIPELINE_OUT, outLines.join('\n'), 'utf8');

@@ -4,6 +4,13 @@
 /** @typedef {import('./_types.js').PortalEntry} PortalEntry */
 /** @typedef {import('./_types.js').Context} Context */
 
+// Schema v2 (CP2 22/may/26): Gupy `workplaceType` ('remote'|'hybrid'|'on-site')
+// maps 1:1 to canonical WorkMode via classify-work-mode::workModeFromEnum.
+// Tenant subdomain implies BR base → br_eligible defaults BR_OK; remote-only
+// portals (rare) would still be BR_OK since Gupy hosts Brazilian companies.
+
+import { workModeFromEnum, brEligibleFromStructuredLocation } from '../classify-work-mode.mjs';
+
 // Gupy BR provider — Next.js __NEXT_DATA__ SSR extraction.
 //
 // HISTORY: April recon found portal.api.gupy.io/api/job only indexes the
@@ -127,11 +134,25 @@ async function fetch(entry, ctx) {
 
     const hash = encodeJobHash(id);
     const url = `${origin}/job/${hash}?jobBoardSource=google_for_jobs`;
+    const work_mode = workModeFromEnum(j?.workplace?.workplaceType || '');
+    // Build a structured loc obj for brEligibleFromStructuredLocation
+    const addr = j?.workplace?.address || {};
+    const locForBR = {
+      city: addr.city || '',
+      region: addr.state || '',
+      country: addr.country || 'Brazil', // Gupy tenants are BR-hosted
+      fullLocation: '',
+    };
+    const br_eligible = brEligibleFromStructuredLocation(locForBR, work_mode);
+    const locationFmt = formatLocation(j?.workplace);
     out.push({
       title,
       url,
       company,
-      location: formatLocation(j?.workplace),
+      location: locationFmt,
+      work_mode,
+      br_eligible,
+      location_real: locationFmt,
     });
   }
   return out;

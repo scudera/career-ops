@@ -3,9 +3,52 @@
 /** @typedef {import('./_types.js').Job} Job */
 /** @typedef {import('./_types.js').PortalEntry} PortalEntry */
 /** @typedef {import('./_types.js').Context} Context */
+/** @typedef {import('./_types.js').WorkMode} WorkMode */
+/** @typedef {import('./_types.js').BrEligible} BrEligible */
 
 // Workday provider — hits the public CXS jobs endpoint via POST.
 // Auto-detects from careers_url pattern `https://{tenant}.{shard}.myworkdayjobs.com/{site}`.
+//
+// Schema v2 (CP2 22/may/26): infers work_mode + br_eligible from
+// `posting.locationsText` heuristics. Workday CXS doesn't expose a remote/
+// hybrid enum at the list level, so signal comes from the location string
+// itself (e.g. "USA-Remote", "São Paulo, Brazil"). Ambiguous strings →
+// UNKNOWN; pre-apply-check enrich resolves them downstream.
+
+const BR_LOC_HINT = /\b(brasil|brazil|^br$|s[aã]o\s*paulo|rio\s*de\s*janeiro|campinas|jarinu|barueri|guarulhos)\b/i;
+const REMOTE_LOC_HINT = /\b(remote|remoto|home[\s-]?based|teletrabalho)\b/i;
+const HYBRID_LOC_HINT = /\bhybrid|h[ií]brido\b/i;
+
+/**
+ * @param {string} locationsText
+ * @returns {{work_mode: WorkMode, br_eligible: BrEligible}}
+ */
+function inferModeFromLocation(locationsText) {
+  const lt = (locationsText || '').trim();
+  if (!lt) return { work_mode: 'UNKNOWN', br_eligible: 'UNKNOWN' };
+  const isBR = BR_LOC_HINT.test(lt);
+  const isRemote = REMOTE_LOC_HINT.test(lt);
+  const isHybrid = HYBRID_LOC_HINT.test(lt);
+  /** @type {WorkMode} */
+  let work_mode = 'UNKNOWN';
+  if (isHybrid) work_mode = 'HYBRID';
+  else if (isRemote) work_mode = 'REMOTE';
+  // ON_SITE inferred only when location is concrete city (not "remote"/"hybrid")
+  // and no remote/hybrid signal — but locationsText alone doesn't confirm on-site
+  // unambiguously, so leave UNKNOWN unless explicit.
+  /** @type {BrEligible} */
+  let br_eligible = 'UNKNOWN';
+  if (work_mode === 'REMOTE') {
+    if (isBR) br_eligible = 'BR_OK';
+    else if (lt) br_eligible = 'RELOCATION_REQUIRED'; // remote but non-BR country named
+  } else {
+    if (isBR) br_eligible = 'BR_OK';
+    // Non-BR concrete city → RELOCATION (but we don't know if it's on-site;
+    // mark as RELOCATION if a non-BR country appears, conservative).
+    else if (lt && !isRemote && !isHybrid) br_eligible = 'RELOCATION_REQUIRED';
+  }
+  return { work_mode, br_eligible };
+}
 
 const WORKDAY_HOST_REGEX = /^https:\/\/([\w-]+)\.(wd\d+)\.myworkdayjobs\.com\/([^/?#]+)/;
 const WORKDAY_HOST_SUFFIX = '.myworkdayjobs.com';
@@ -163,11 +206,16 @@ export default {
 
       for (const posting of data.jobPostings) {
         if (!posting?.title || !posting?.externalPath) continue;
+        const locationsText = String(posting.locationsText || '');
+        const inferred = inferModeFromLocation(locationsText);
         jobs.push({
           title: String(posting.title),
           url: baseDisplay + String(posting.externalPath),
           company,
-          location: String(posting.locationsText || ''),
+          location: locationsText,
+          work_mode: inferred.work_mode,
+          br_eligible: inferred.br_eligible,
+          location_real: locationsText, // best-effort canonical; CXS doesn't expose richer structure
         });
       }
 

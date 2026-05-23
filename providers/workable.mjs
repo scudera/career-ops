@@ -7,6 +7,12 @@
 // Workable provider — hits the public widget endpoint.
 // Endpoint: GET https://apply.workable.com/api/v1/widget/accounts/{slug}
 // Adapted from LeoLaborie/claude-apply (MIT) src/scan/ats/workable.mjs.
+//
+// Schema v2 (CP2 22/may/26): Workable widget JSON exposes `telecommuting`
+// boolean + `workplace` string (when present). Mapped via
+// classify-work-mode::workModeFromEnum + brEligibleFromStructuredLocation.
+
+import { workModeFromEnum, brEligibleFromStructuredLocation } from '../classify-work-mode.mjs';
 
 const WORKABLE_HOST = 'apply.workable.com';
 const WORKABLE_API_BASE = `https://${WORKABLE_HOST}/api/v1/widget/accounts`;
@@ -61,12 +67,23 @@ const provider = {
 
     return jobs
       .filter((j) => j?.title && (j?.shortlink || j?.url))
-      .map((j) => ({
-        title: String(j.title),
-        url: String(j.shortlink || j.url),
-        company,
-        location: formatLocation(j),
-      }));
+      .map((j) => {
+        // Workable: prefer explicit `workplace` enum, fall back to telecommuting bool
+        let work_mode = workModeFromEnum(j?.workplace || '');
+        if (work_mode === 'UNKNOWN' && j?.telecommuting === true) work_mode = 'REMOTE';
+        const loc = { city: j?.city || '', region: j?.region || '', country: j?.country || '', fullLocation: '' };
+        const br_eligible = brEligibleFromStructuredLocation(loc, work_mode);
+        const locationFmt = formatLocation(j);
+        return {
+          title: String(j.title),
+          url: String(j.shortlink || j.url),
+          company,
+          location: locationFmt,
+          work_mode,
+          br_eligible,
+          location_real: locationFmt,
+        };
+      });
   },
 };
 

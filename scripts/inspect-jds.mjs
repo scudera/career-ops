@@ -18,7 +18,7 @@
  */
 
 import { chromium } from 'playwright';
-import { classifyFromHtml } from '../classify-work-mode.mjs';
+import { classifyFromHtml, waitForStableDOM } from '../classify-work-mode.mjs';
 
 /**
  * @param {import('playwright').Page} page
@@ -29,7 +29,9 @@ export async function inspectOne(page, url) {
   const out = { url, location_real: '', work_mode: 'UNKNOWN', br_eligible: 'UNKNOWN', tier: 4, evidence: '', error: null };
   try {
     await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 45000 });
-    await page.waitForTimeout(2500); // Phenom/Workday hydrate body innerText async; <2s is flaky for keywords like "Hybrid" embedded in the rendered card
+    const wait = await waitForStableDOM(page);
+    const tag = wait.stable ? '' : ' (TIMEOUT)';
+    process.stderr.write(`[classify] dom-stable: url=${url.slice(0, 90)} waited=${wait.waitedMs}ms len=${wait.finalLen}${tag}\n`);
     const html = await page.content();
     const bodyText = await page.evaluate(() => document.body?.innerText || '');
     const cls = classifyFromHtml(html, bodyText);

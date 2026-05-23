@@ -308,3 +308,42 @@ export function brEligibleFromStructuredLocation(loc, work_mode) {
   }
   return 'UNKNOWN';
 }
+
+/**
+ * Dynamic DOM-stability wait — polls document.body.innerText.length until
+ * it stops changing for `minStableMs`. Resolves Risk #2 (CP3 = Option C):
+ * SPA hydration is non-deterministic, the previous fixed 2500ms wait was
+ * flaky on slow Phenom/Workday loads and wasteful on fast ones.
+ *
+ * On TIMEOUT (>= maxWaitMs without ever stabilizing), returns { stable:false }
+ * — caller MUST still proceed with classification on the partial DOM and log
+ * the timeout in stderr.
+ *
+ * @param {import('playwright').Page} page
+ * @param {{minStableMs?: number, maxWaitMs?: number, pollMs?: number}} [opts]
+ * @returns {Promise<{stable: boolean, waitedMs: number, finalLen: number}>}
+ */
+export async function waitForStableDOM(page, opts = {}) {
+  const {
+    minStableMs = 500,
+    maxWaitMs = 8000,
+    pollMs = 200,
+  } = opts;
+  const start = Date.now();
+  let lastLen = 0;
+  let stableSince = 0;
+  while (Date.now() - start < maxWaitMs) {
+    const len = await page.evaluate(() => document.body?.innerText?.length || 0);
+    if (len === lastLen && len > 0) {
+      if (stableSince === 0) stableSince = Date.now();
+      if (Date.now() - stableSince >= minStableMs) {
+        return { stable: true, waitedMs: Date.now() - start, finalLen: len };
+      }
+    } else {
+      stableSince = 0;
+      lastLen = len;
+    }
+    await page.waitForTimeout(pollMs);
+  }
+  return { stable: false, waitedMs: maxWaitMs, finalLen: lastLen };
+}

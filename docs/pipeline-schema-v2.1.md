@@ -1,4 +1,4 @@
-# pipeline.md schema v2
+# pipeline.md schema v2.1
 
 ## Motivação
 
@@ -97,3 +97,115 @@ Schema validator rejeita silently coerce:
 - `location_real` empty string permitido (JD silent é signal valid)
 
 Quando metadata v2 ausente da linha (linha v1 legada), parser retorna `{tier: null, work_mode: null, br_eligible: null}` — não coerce.
+
+---
+
+# v2.1 expansion (COTSK-7 23/may/26)
+
+## Motivação
+
+Deep search OSS (22/may/26) identificou career-ops como tendo schema bare-bones (4 campos v1) vs jobhive (23) e ever-jobs (~30). v2 adicionou 4 (work_mode/br_eligible/tier/location_real). v2.1 adiciona 7 high-value flat fields.
+
+**Big finding pré-v2.1**: scan.mjs `appendToPipeline` escrevia só 3 fields (`url | company | title`) — metadata v2 nunca foi persistido em pipeline.md. v2.1 wires entire v2.0 + v2.1 serialization chain pela primeira vez.
+
+## 7 campos novos (todos optional, flat)
+
+| Campo | Type | Source per provider |
+|---|---|---|
+| `employment_type` | enum (closed) | Workday `timeType`, Gupy `type`, Workable `employment_type`, Phenom JSON-LD `employmentType`, SmartRec `experience` |
+| `compensation_min` | number | Ashby/Greenhouse metadata, Workable salary range, Phenom JSON-LD `baseSalary.value.minValue` |
+| `compensation_max` | number | mesmos providers |
+| `compensation_currency` | string (ISO 4217) | USD / BRL / EUR / GBP / etc. |
+| `compensation_period` | enum (closed) | HOUR / DAY / WEEK / MONTH / YEAR / UNKNOWN |
+| `posted_at` | YYYY-MM-DD | Workday `postedOn` (parsed from "Posted N Days Ago"), Gupy `publishedDate`, Workable `published_on`, Phenom JSON-LD `datePosted` |
+| `apply_url` | string (URL) | URL direto para form quando distinto da listing URL — Workday CXS, Gupy redirect, Workable apply_url |
+
+### Enum `employment_type` (closed)
+
+```
+FULL_TIME | PART_TIME | CONTRACT | INTERN | TEMPORARY | UNKNOWN
+```
+
+Mappings per provider:
+- Workday `timeType`: `Full time` → FULL_TIME, `Part time` → PART_TIME
+- Gupy `type`: `effective` → FULL_TIME, `intern` → INTERN, `trainee` → INTERN, `temporary` → TEMPORARY
+- Workable `employment_type`: `full-time` → FULL_TIME, `part-time` → PART_TIME, `contract` → CONTRACT, `internship` → INTERN, `temporary` → TEMPORARY
+- Phenom JSON-LD schema.org: FULL_TIME, PART_TIME, CONTRACTOR → CONTRACT, TEMPORARY → TEMPORARY, INTERN → INTERN, VOLUNTEER/PER_DIEM/OTHER → UNKNOWN
+- SmartRec: TBD per response shape (não documentado pelo provider)
+
+### Enum `compensation_period` (closed)
+
+```
+HOUR | DAY | WEEK | MONTH | YEAR | UNKNOWN
+```
+
+Phenom JSON-LD `baseSalary.value.unitText` mapeia direto. Outros providers normalizam pra YEAR quando reportam annual range.
+
+### `posted_at` format
+
+**YYYY-MM-DD only.** Time component truncado mesmo quando provider expõe full ISO timestamp (decisão Vitor — providers reportam dia, time é raro útil). Writer SEMPRE emite date-only.
+
+**Workday quirk**: `postedOn` vem como `"Posted 9 Days Ago"` (string humana), não ISO. Provider parser converte pra date relativa (today - N days).
+
+### `apply_url` rule
+
+Só escrever quando **distinto** da listing `url`. Se provider expõe applyUrl idêntico, omit.
+
+## Encoding inline pipeline.md
+
+### v2.0 (deprecated mas mantido pra compat) — write site previously absent
+
+```
+- [ ] URL | Company | Title | T=N wm=WM br=BR loc=Location Real
+```
+
+### v2.1 (NOVO — primeira vez serialized end-to-end)
+
+```
+- [ ] URL | Company | Title | T=N wm=WM br=BR loc=Location Real | et=ET cmin=N cmax=N ccy=CCY cper=PER posted=YYYY-MM-DD apply=URL
+```
+
+**5o pipe-delimited field carrega v2.1 metadata.** Tokens space-separated, todos individualmente optional, **omit tokens sem valor** (não escrever `cmin=` vazio).
+
+### Ordem de pipes
+
+| pipe | field | format |
+|---|---|---|
+| `[0]` | `- [ ]` checkbox + URL | `https://...` |
+| `[1]` | Company | free-form |
+| `[2]` | Title | free-form (legacy v1 location hint em parens) |
+| `[3]` | v2.0 metadata (optional) | `T=N wm=WM br=BR loc=...` |
+| `[4]` | v2.1 metadata (optional) | `et=ET cmin=N cmax=N ccy=CCY cper=PER posted=YYYY-MM-DD apply=URL` |
+
+### Coexistência 3 formats
+
+Pipeline.md aceita 3, 4 ou 5 pipes silenciosamente:
+- **3 pipes (v1 legacy)**: all v2/v2.1 fields parsed como null
+- **4 pipes (v2.0)**: v2 fields populated, v2.1 null
+- **5 pipes (v2.1)**: ambos populated
+
+Sem migração obrigatória. Old entries permanecem como estão; novo scan escreve v2.1.
+
+## Parse regexes
+
+```js
+// filter-candidates.mjs
+const V2_SUFFIX_RE  = /T=(\d)\s+wm=(\w+)\s+br=(\w+)(?:\s+loc=(.+))?$/;        // unchanged
+const V21_SUFFIX_RE = /(?:et=(\w+))?\s*(?:cmin=(\d+))?\s*(?:cmax=(\d+))?\s*(?:ccy=(\w+))?\s*(?:cper=(\w+))?\s*(?:posted=([\d-]+))?\s*(?:apply=(\S+))?/;
+```
+
+Each v2.1 token capture group independently optional. Caller checks `parts[4]?.includes('=')` before applying regex (defensive — empty parts[4] shouldn't match all-undefined).
+
+## Validação ao parse
+
+- `employment_type` ∉ enum closed → null (não silently coerce)
+- `compensation_period` ∉ enum closed → null
+- `compensation_min/max` parse via `parseInt` — se NaN, null
+- `posted_at` regex `/^\d{4}-\d{2}-\d{2}$/` strict — não-conformante → null
+- `apply_url` precisa parsear como URL absoluta — senão null
+
+## Decisões Vitor (lock)
+
+- **Flat** (não nested objects)
+- **`descriptionText` NÃO persisted** em pipeline.md — runtime-only quando precisar fetch
+- **Backward compat** obrigatório com entries v2.0 (na verdade v1, já que v2.0 nunca foi escrito)

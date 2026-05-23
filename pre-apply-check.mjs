@@ -21,6 +21,7 @@
 
 import { chromium } from 'playwright';
 import { classifyLiveness } from './liveness-core.mjs';
+import { classifyFromHtml, waitForStableDOM } from './classify-work-mode.mjs';
 
 async function checkUrl(page, url) {
   try {
@@ -28,8 +29,12 @@ async function checkUrl(page, url) {
 
     const status = response?.status() ?? 0;
 
-    // Give SPAs (Ashby, Lever, Workday) time to hydrate
-    await page.waitForTimeout(2000);
+    // Give SPAs (Ashby, Lever, Workday) time to hydrate — dynamic polling
+    // (CP3 Phase A: substitutes the prior fixed 2000ms wait).
+    const wait = await waitForStableDOM(page);
+    if (!wait.stable) {
+      process.stderr.write(`[pre-apply] dom-stable: waited=${wait.waitedMs}ms (TIMEOUT) — classification on partial DOM\n`);
+    }
 
     const finalUrl = page.url();
     const bodyText = await page.evaluate(() => document.body?.innerText ?? '');
@@ -66,7 +71,29 @@ async function checkUrl(page, url) {
         .filter(Boolean);
     });
 
-    return classifyLiveness({ status, finalUrl, bodyText, applyControls });
+    const liveness = classifyLiveness({ status, finalUrl, bodyText, applyControls });
+
+    // Always enrich when liveness is ACTIVE — page is already loaded, so the
+    // classification is free. Caller (career-ops apply mode, manual review)
+    // decides whether to surface the v2 fields. Old callers ignore `enriched`
+    // (backward-compat: pure additive JSON key).
+    if (liveness.result === 'active') {
+      try {
+        const html = await page.content();
+        const cls = classifyFromHtml(html, bodyText);
+        liveness.enriched = {
+          work_mode: cls.work_mode,
+          br_eligible: cls.br_eligible,
+          tier: cls.tier,
+          location_real: cls.location_real,
+          evidence: cls.evidence,
+        };
+      } catch (err) {
+        liveness.enriched = { error: err.message.split('\n')[0].slice(0, 120) };
+      }
+    }
+
+    return liveness;
 
   } catch (err) {
     return { result: 'expired', reason: `navigation error: ${err.message.split('\n')[0]}` };
@@ -104,20 +131,24 @@ async function main() {
   }
 
   const browser = await chromium.launch({ headless: true });
-  let result, reason;
+  let result, reason, enriched;
 
   try {
     const page = await browser.newPage();
-    ({ result, reason } = await checkUrl(page, url));
+    ({ result, reason, enriched } = await checkUrl(page, url));
   } finally {
     await browser.close();
   }
 
   const output = { result, reason, job_num: jobNum, url };
+  if (enriched) output.enriched = enriched;
 
   // Human-readable to stderr (stdout stays clean JSON)
   if (result === 'active') {
     process.stderr.write('✅ Vaga ativa — prosseguir com geração do pacote\n');
+    if (enriched && !enriched.error) {
+      process.stderr.write(`   work_mode=${enriched.work_mode} br_eligible=${enriched.br_eligible} tier=${enriched.tier} location_real="${enriched.location_real}"\n`);
+    }
   } else if (result === 'expired') {
     process.stderr.write(`❌ Vaga expirada — abortar geração. Motivo: ${reason}\n`);
   } else {

@@ -366,5 +366,82 @@ Write one TSV file per evaluation to `batch/tracker-additions/{num}-{company-slu
 - No markdown bold (`**`) in status field
 - No dates in status field (use the date column)
 - No extra text (use the notes column)
+
+## Notion task+handoff protocol (career-ops)
+
+Career-ops usa Notion como queue de tasks e store de handoffs E2E.
+Vitor não consome Notion diretamente — é infra invisível pra agentes.
+
+**Databases**:
+- `career-ops tasks` — data_source_id: `197fdf04-4a9e-449d-ac37-b50066c0f322` — URL: https://www.notion.so/f039a1b36a1b40e3a15c62565e1a26ec
+- `career-ops handoffs` — data_source_id: `91543243-706e-45e5-90d0-e223604fad72` — URL: https://www.notion.so/c7b08f9e324e4ea8abfaf60ee4cac55a
+
+### <important if="iniciando sessão career-ops OU usuário pediu pra rodar task">
+
+1. **Lê queue de tasks** pendentes via MCP Notion:
+   - Filter: `Status = 'queued'` AND `Assigned to = 'claude-code'`
+   - Sort: `Task ID` ASC (FIFO)
+   - Se múltiplas tasks queued, executa em ordem ou pergunta ao Vitor qual priorizar
+2. **Antes de executar**, atualiza Status pra `'in-progress'`.
+3. **Executa o body da task literalmente.** Body contém:
+   - Contexto carregado (branch state, decisões prévias)
+   - Escopo (fases, ordem)
+   - Commits esperados (msg padrão por fase)
+   - Common rules
+   - Template HANDOFF obrigatório
+
+### </important>
+
+### <important if="terminou execução da task OU bloqueou em algum ponto">
+
+1. **Cria handoff page em `career-ops handoffs` DB** via MCP Notion (`notion-create-pages`):
+   - Title: `<CP> HANDOFF — <slug fase>`
+   - Properties:
+     - Track: <mesmo da task>
+     - Checkpoint: <CP1|CP2|CP3|CP4>
+     - Phase: <kebab-case>
+     - Source task: relation pra task original (COTSK-N)
+     - Created by: `claude-code`
+     - Signoff status: `pending` (default), OR `blocked` se travou
+   - Body (markdown) segue template definido no body da task.
+2. **Atualiza task original** Status:
+   - `'completed'` se PASS
+   - `'blocked'` se travou (com handoff page descrevendo bloqueio)
+3. **NÃO push** branch nem mergea PRs sem sign-off explícito do Vitor.
+4. **NÃO inicia próxima task** automaticamente — aguarda Vitor revisar handoff e criar/aprovar próxima task.
+
+### </important>
+
+### <important if="prompt do Vitor pede algo sem task Notion correspondente">
+
+Decisão por escopo:
+- **Trabalho rápido (<5min, <2 arquivos, sem checkpoints)**: executa direto no chat, sem criar task Notion. Ex: bash one-liner, ler arquivo específico, fix typo.
+- **Trabalho substantivo (>5min, múltiplas fases, requer rastreabilidade)**: PARAR antes de executar. Avisar Vitor: "Esse trabalho merece task Notion. Quer que eu crie a task primeiro ou prefere executar direto sem rastro estruturado?". Aguardar resposta.
+
+Não criar task Notion silenciosamente sem aprovação — task Notion = compromisso com sign-off cycle e custa overhead.
+
+### </important>
+
+### File structure recon mandatório
+
+Antes de emitir qualquer prompt CC com paths concretos OU antes de editar arquivos
+cujo path foi assumido (não verificado nesta sessão), CC DEVE rodar `view` ou
+`find` pra confirmar a estrutura real. Spec com paths não-verificados = retrabalho
+garantido (lição career-ops 22/may/26: `src/filter-candidates.mjs` e
+`src/providers/` não existiam, descoberto só no STOP pós-advisor).
+
+### HANDOFF deliverable mandatório
+
+Fim de fase SEM handoff page no Notion = fase incompleta. Mesmo se commits foram
+feitos, mesmo se trabalho técnico tá OK. HANDOFF é o deliverable que permite
+sign-off; sem ele Vitor não tem o que aprovar e CP cycle quebra.
+
+### Repo isolation
+
+Career-ops ≠ pokerplaybook. CLAUDE.md, MCPs, databases Notion, Supabase, branches
+— tudo separado. Não cruzar contexto: não referenciar tabelas pokerplaybook em
+discussões career-ops, não aplicar protocolo Supabase handoffs de pokerplaybook
+no career-ops. Quando em dúvida, pergunta ao Vitor antes de assumir.
+
 @AGENTS.md
 <!-- Add anything Claude Code specific that other agents don't need -->

@@ -145,11 +145,15 @@ async function fetch(entry, ctx) {
     };
     const br_eligible = brEligibleFromStructuredLocation(locForBR, work_mode);
     const locationFmt = formatLocation(j?.workplace);
-    // v2.1: Gupy NEXT_DATA expõe `type` (effective/intern/trainee/temporary)
-    // e `publishedDate` (ISO timestamp). Sem compensation/apply_url no payload
-    // typical BR. Both fields opcional — undefined quando ausente.
-    const employment_type = employmentTypeFromEnum(j?.type || '');
-    const posted_at = j?.publishedDate ? truncateDateISO(String(j.publishedDate)) : undefined;
+    // v2.1: Gupy NEXT_DATA expõe `type` com prefixo `vacancy_type_`
+    // (vacancy_type_effective/intern/trainee/temporary). publishedDate NÃO
+    // está exposto no payload SSR atual (recon COTSK-7 23/may). Sem
+    // compensation/apply_url. Strip prefix antes do enum mapper.
+    const rawType = String(j?.type || '').replace(/^vacancy_type_/i, '');
+    const employment_type = employmentTypeFromEnum(rawType);
+    // posted_at deferred — Gupy NEXT_DATA não expõe (probe COTSK-7 confirmou
+    // job keys = {id, title, type, department, workplace, quickApply} apenas).
+    const posted_at = undefined;
     /** @type {Job} */
     const job = {
       title,

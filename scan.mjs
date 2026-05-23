@@ -25,6 +25,7 @@
  *   node scan.mjs --dry-run        # preview without writing files
  *   node scan.mjs --company Cohere # scan a single company
  *   node scan.mjs --verify         # Playwright-check each new URL; drop expired postings
+ *   node scan.mjs --phenom-enrich  # Phenom: scan-time JSON-LD enrich (off by default)
  */
 
 import { readFileSync, writeFileSync, appendFileSync, existsSync, mkdirSync, readdirSync } from 'fs';
@@ -433,6 +434,7 @@ async function main() {
   const args = process.argv.slice(2);
   const dryRun = args.includes('--dry-run');
   const verify = args.includes('--verify');
+  const phenomEnrich = args.includes('--phenom-enrich');
   const companyFlag = args.indexOf('--company');
   const filterCompany = companyFlag !== -1 ? args[companyFlag + 1]?.toLowerCase() : null;
 
@@ -493,6 +495,12 @@ async function main() {
     let provider = company._provider;
     const ctx = makeHttpCtx();
     let sourceName = provider.id === 'local-parser' ? 'local-parser' : `${provider.id}-api`;
+    // Provider-specific opt-in flags. Phenom enrich is the only one today
+    // (COTSK-11 Sub-track A); pass-through pattern lets future providers
+    // adopt the same mechanism without touching the core dispatch.
+    if (phenomEnrich && provider.id === 'phenom') {
+      company = { ...company, phenom_enrich: true };
+    }
     try {
       let jobs;
       try {

@@ -4,6 +4,16 @@
 /** @typedef {import('./_types.js').PortalEntry} PortalEntry */
 /** @typedef {import('./_types.js').Context} Context */
 
+import {
+  extractJsonLdBlocks,
+  findJobPosting,
+  parseJobPosting,
+  truncateDateISO,
+  employmentTypeFromEnum,
+  compensationPeriodFromEnum,
+  brEligibleFromStructuredLocation,
+} from '../classify-work-mode.mjs';
+
 // Phenom ATS provider — sitemap-based discovery.
 //
 // Phenom's job-listing widget API is session-bound (POST /widgets with a
@@ -28,6 +38,19 @@
 const PHENOM_HOST_REGEX = /^https?:\/\/(jobs\.thermofisher\.com|jobs\.merck\.com)(?:\/|$)/i;
 const SITEMAP_TIMEOUT_MS = 20000;
 const MAX_SUB_SITEMAPS = 10;
+
+// --- Scan-time JSON-LD enrich (opt-in via entry.phenom_enrich) ---
+// COTSK-11 Sub-track A. Phenom JDs expose JSON-LD JobPosting per page; this
+// pass scrapes them at scan time to populate v2.1 fields directly in
+// pipeline.md, sparing pre-apply-check the same work later. Default OFF —
+// preserves CP1's "lazy enrich" decision. Vitor opts in per scan via
+// `--phenom-enrich` (scan.mjs threads it onto matched entries).
+const ENRICH_FETCH_TIMEOUT_MS = 15000;
+const ENRICH_CONCURRENCY = 3;
+const ENRICH_INTER_CHUNK_MS = 200;
+// Hard cap to bound cost on tenants with thousands of URLs (Thermo has ~1000+).
+// 200 URLs / 3 concurrency × 200ms + 200 × ~1s fetch ≈ 3.5 min worst case.
+const MAX_ENRICH_URLS = 200;
 
 /**
  * Convert a Phenom job-slug URL to a clean title.
@@ -67,6 +90,106 @@ function extractLocs(xml) {
 }
 
 /**
+ * Map a parsed JSON-LD JobPosting to v2.1 Job fields. Mutates `job` in place
+ * (only setting fields that are non-undefined to keep the schema clean).
+ * Schema.org employmentType may be a string OR an array — we take the first
+ * recognized value.
+ *
+ * @param {Job} job
+ * @param {object} jp — raw JobPosting node
+ */
+function enrichJobFromJobPosting(job, jp) {
+  const parsed = parseJobPosting(jp);
+  // employmentType: string or array of strings
+  const etRaw = /** @type {any} */(jp).employmentType;
+  const etCandidates = Array.isArray(etRaw) ? etRaw : (etRaw ? [etRaw] : []);
+  for (const et of etCandidates) {
+    const mapped = employmentTypeFromEnum(String(et));
+    if (mapped && mapped !== 'UNKNOWN') { job.employment_type = mapped; break; }
+  }
+  // posted_at: prefer datePosted, fall back to dateCreated
+  const dRaw = /** @type {any} */(jp).datePosted || /** @type {any} */(jp).dateCreated;
+  const posted_at = truncateDateISO(dRaw);
+  if (posted_at) job.posted_at = posted_at;
+  // baseSalary — Schema.org structures vary: { value: number } | { value: { value, minValue, maxValue, currency, unitText } } | { minValue, maxValue, ... }
+  const bs = /** @type {any} */(jp).baseSalary;
+  if (bs && typeof bs === 'object') {
+    const v = bs.value && typeof bs.value === 'object' ? bs.value : bs;
+    const min = Number(v.minValue ?? v.value);
+    const max = Number(v.maxValue ?? v.value);
+    if (Number.isFinite(min) && min > 0) job.compensation_min = min;
+    if (Number.isFinite(max) && max > 0) job.compensation_max = max;
+    const ccy = v.currency || bs.currency;
+    if (typeof ccy === 'string' && /^[A-Z]{3}$/.test(ccy.trim())) {
+      job.compensation_currency = ccy.trim();
+    }
+    const period = compensationPeriodFromEnum(String(v.unitText || ''));
+    if (period && period !== 'UNKNOWN') job.compensation_period = period;
+  }
+  // work_mode + br_eligible + location_real
+  // Phenom JDs typically expose jobLocationType=TELECOMMUTE only when remote.
+  if (parsed.locationType === 'TELECOMMUTE') {
+    job.work_mode = 'REMOTE';
+  }
+  const firstLoc = parsed.allLocations[0] || '';
+  if (firstLoc) job.location_real = firstLoc;
+  // Build a structured loc for br_eligible inference.
+  if (parsed.locality || parsed.region || parsed.country) {
+    const locStruct = {
+      city: parsed.locality || '',
+      region: parsed.region || '',
+      country: parsed.country || '',
+      fullLocation: firstLoc,
+    };
+    const br = brEligibleFromStructuredLocation(locStruct, job.work_mode);
+    if (br && br !== 'UNKNOWN') job.br_eligible = br;
+  }
+}
+
+/**
+ * Enrich a batch of Jobs by HTTP-fetching each URL and parsing JSON-LD
+ * JobPosting. Per-URL failures degrade gracefully (UNKNOWN fields preserved)
+ * with a stderr log line. Honors MAX_ENRICH_URLS cap + chunked concurrency.
+ *
+ * @param {Job[]} jobs
+ * @param {Context} ctx
+ * @returns {Promise<{enriched: number, failed: number, skipped: number}>}
+ */
+async function enrichJobsWithJsonLd(jobs, ctx) {
+  const slice = jobs.slice(0, MAX_ENRICH_URLS);
+  const skipped = jobs.length - slice.length;
+  let enriched = 0;
+  let failed = 0;
+  for (let i = 0; i < slice.length; i += ENRICH_CONCURRENCY) {
+    const chunk = slice.slice(i, i + ENRICH_CONCURRENCY);
+    await Promise.all(chunk.map(async (job) => {
+      try {
+        const html = await ctx.fetchText(job.url, {
+          timeoutMs: ENRICH_FETCH_TIMEOUT_MS,
+          headers: { Accept: 'text/html,application/xhtml+xml' },
+        });
+        const blocks = extractJsonLdBlocks(html);
+        const jp = findJobPosting(blocks);
+        if (!jp) {
+          failed++;
+          process.stderr.write(`[phenom] enrich: no JobPosting in ${job.url}\n`);
+          return;
+        }
+        enrichJobFromJobPosting(job, jp);
+        enriched++;
+      } catch (err) {
+        failed++;
+        process.stderr.write(`[phenom] enrich fetch error ${job.url}: ${err?.message || err}\n`);
+      }
+    }));
+    if (i + ENRICH_CONCURRENCY < slice.length) {
+      await new Promise((r) => setTimeout(r, ENRICH_INTER_CHUNK_MS));
+    }
+  }
+  return { enriched, failed, skipped };
+}
+
+/**
  * @param {PortalEntry & { sitemap_url?: string, search_text?: string }} entry
  */
 function detect(entry) {
@@ -78,7 +201,7 @@ function detect(entry) {
 }
 
 /**
- * @param {PortalEntry & { sitemap_url?: string, search_text?: string }} entry
+ * @param {PortalEntry & { sitemap_url?: string, search_text?: string, phenom_enrich?: boolean }} entry
  * @param {Context} ctx
  * @returns {Promise<Job[]>}
  */
@@ -109,33 +232,43 @@ async function fetch(entry, ctx) {
   });
 
   const subSitemaps = extractLocs(indexXml).filter((u) => /sitemap\d*\.xml/i.test(u));
+  /** @type {Job[]} */
+  let jobs;
   if (subSitemaps.length === 0) {
     // Some tenants serve a flat sitemap (no index) — treat indexXml as the
     // listing itself.
-    return extractFromXml(indexXml, host, company, filter);
+    jobs = extractFromXml(indexXml, host, company, filter);
+  } else {
+    jobs = [];
+    const seen = new Set();
+    for (const subUrl of subSitemaps.slice(0, MAX_SUB_SITEMAPS)) {
+      let subXml;
+      try {
+        subXml = await ctx.fetchText(subUrl, {
+          timeoutMs: SITEMAP_TIMEOUT_MS,
+          headers: { Accept: 'application/xml,text/xml' },
+        });
+      } catch (err) {
+        // Skip a broken sub-sitemap rather than abort the whole tenant.
+        continue;
+      }
+      const subJobs = extractFromXml(subXml, host, company, filter);
+      for (const j of subJobs) {
+        if (seen.has(j.url)) continue;
+        seen.add(j.url);
+        jobs.push(j);
+      }
+    }
   }
 
-  /** @type {Job[]} */
-  const jobs = [];
-  const seen = new Set();
-
-  for (const subUrl of subSitemaps.slice(0, MAX_SUB_SITEMAPS)) {
-    let subXml;
-    try {
-      subXml = await ctx.fetchText(subUrl, {
-        timeoutMs: SITEMAP_TIMEOUT_MS,
-        headers: { Accept: 'application/xml,text/xml' },
-      });
-    } catch (err) {
-      // Skip a broken sub-sitemap rather than abort the whole tenant.
-      continue;
-    }
-    const subJobs = extractFromXml(subXml, host, company, filter);
-    for (const j of subJobs) {
-      if (seen.has(j.url)) continue;
-      seen.add(j.url);
-      jobs.push(j);
-    }
+  // Opt-in scan-time enrich (COTSK-11 Sub-track A). Default OFF preserves
+  // CP1's lazy-enrich pattern; pre-apply-check resolves v2.1 fields at
+  // runtime on the URLs the user actually opens.
+  if (entry?.phenom_enrich === true && jobs.length > 0) {
+    const stats = await enrichJobsWithJsonLd(jobs, ctx);
+    process.stderr.write(
+      `[phenom] enrich tenant="${host}" jobs=${jobs.length} enriched=${stats.enriched} failed=${stats.failed} skipped=${stats.skipped}\n`
+    );
   }
 
   return jobs;

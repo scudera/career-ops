@@ -1,0 +1,113 @@
+{
+  "per_tenant": [
+    {
+      "name": "Brainfarma (Gupy)",
+      "total": 75,
+      "et_count": 65,
+      "et_pct": 87,
+      "posted_count": 75,
+      "posted_pct": 100,
+      "elapsed_ms": 2082,
+      "error": null
+    },
+    {
+      "name": "Eurofarma (Gupy)",
+      "total": 48,
+      "et_count": 36,
+      "et_pct": 75,
+      "posted_count": 48,
+      "posted_pct": 100,
+      "elapsed_ms": 182,
+      "error": null
+    },
+    {
+      "name": "Hypera Pharma (Gupy)",
+      "total": 68,
+      "et_count": 64,
+      "et_pct": 94,
+      "posted_count": 68,
+      "posted_pct": 100,
+      "elapsed_ms": 191,
+      "error": null
+    },
+    {
+      "name": "Cristália (Gupy)",
+      "total": 33,
+      "et_count": 29,
+      "et_pct": 88,
+      "posted_count": 0,
+      "posted_pct": 0,
+      "elapsed_ms": 649,
+      "error": null
+    },
+    {
+      "name": "Libbs Farmacêutica (Gupy)",
+      "total": 26,
+      "et_count": 24,
+      "et_pct": 92,
+      "posted_count": 26,
+      "posted_pct": 100,
+      "elapsed_ms": 173,
+      "error": null
+    },
+    {
+      "name": "Prati-Donaduzzi (Gupy)",
+      "total": 37,
+      "et_count": 27,
+      "et_pct": 73,
+      "posted_count": 37,
+      "posted_pct": 100,
+      "elapsed_ms": 176,
+      "error": null
+    },
+    {
+      "name": "Daiichi Sankyo Brasil (Gupy)",
+      "total": 12,
+      "et_count": 8,
+      "et_pct": 67,
+      "posted_count": 0,
+      "posted_pct": 0,
+      "elapsed_ms": 782,
+      "error": null
+    },
+    {
+      "name": "ALS Life Sciences (Gupy)",
+      "total": 48,
+      "et_count": 45,
+      "et_pct": 94,
+      "posted_count": 0,
+      "posted_pct": 0,
+      "elapsed_ms": 787,
+      "error": null
+    },
+    {
+      "name": "Ourofino Saúde Animal (Gupy)",
+      "total": 15,
+      "et_count": 13,
+      "et_pct": 87,
+      "posted_count": 15,
+      "posted_pct": 100,
+      "elapsed_ms": 167,
+      "error": null
+    },
+    {
+      "name": "MCassab Nutrição e Saúde Animal (Gupy)",
+      "total": 11,
+      "et_count": 8,
+      "et_pct": 73,
+      "posted_count": 11,
+      "posted_pct": 100,
+      "elapsed_ms": 169,
+      "error": null
+    }
+  ],
+  "aggregate": {
+    "tenants_api": 7,
+    "tenants_next_data": 3,
+    "total_jobs": 373,
+    "et_count": 319,
+    "et_pct": 86,
+    "posted_count": 280,
+    "posted_pct": 75
+  }
+}

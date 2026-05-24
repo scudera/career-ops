@@ -77,3 +77,7 @@ package-lock.json
 # Local backup files (any path, any date)
 *.backup-*
 *.bak
+
+# Test outputs from COHO-31 onward (manual test evals, not production runs).
+reports/_test/
+jds/_test/

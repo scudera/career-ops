@@ -16,7 +16,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm
+          # `cache: npm` removed (COHO-30/31): package-lock.json is gitignored
+          # per santifer upstream convention, so setup-node@v4 cache step
+          # aborts the workflow with "Dependencies lock file is not found".
 
       - name: Install deps
         # npm install (not npm ci) — package-lock.json is gitignored in this

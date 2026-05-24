@@ -33,7 +33,7 @@ RETRY_FAILED=false
 START_FROM=0
 MAX_RETRIES=2
 MIN_SCORE=0
-MODEL=""  # empty = let claude -p use the Claude Max default
+MODEL="claude-sonnet-4-6"  # pinned (COHO-30): mitigates D6b (model version drift) observed 25/apr/26. Override via --model. When this model deprecates, update or switch to alias 'sonnet' (re-introduces drift risk).
 
 usage() {
   cat <<'USAGE'

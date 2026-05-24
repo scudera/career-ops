@@ -1,0 +1,43 @@
+name: Daily Scan Cron
+
+on:
+  schedule:
+    - cron: '0 9 * * *'   # 9am UTC = 6am BRT
+  workflow_dispatch:       # manual trigger via Actions tab
+
+jobs:
+  scan-and-sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install deps
+        # npm install (not npm ci) — package-lock.json is gitignored in this
+        # repo. install resolves dep ranges from package.json on each run.
+        run: npm install --no-audit --no-fund
+
+      - name: Run scan
+        env:
+          CAREER_OPS_PORTALS: portals.ci.yml
+        run: npm run scan
+
+      - name: Sync to Notion
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+        run: node scripts/sync-pipeline-to-notion.mjs
+
+      - name: Upload pipeline.md artifact (debug)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-${{ github.run_id }}
+          path: data/pipeline.md
+          retention-days: 7

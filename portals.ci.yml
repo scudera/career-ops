@@ -1,0 +1,271 @@
+# Portal Scanner Configuration — CI subset (committed, no secrets)
+#
+# This file is the curated subset used by the daily auto-cron scan in
+# .github/workflows/scan-cron.yml. The full portals.yml lives outside the
+# repo (gitignored, User Layer per DATA_CONTRACT.md). The CI runner picks
+# this file up via CAREER_OPS_PORTALS=portals.ci.yml.
+#
+# Scope: 16 tenants validated post Frente B v2 (CP1–CP5 + STEAL 2/3/6).
+#   - Workday: 9 tenants — direct API scan, no WebSearch, no LLM tokens.
+#   - Gupy:    5 BR pharma tenants — PT-BR liveness fix applied (CP5).
+#   - Phenom:  2 tenants — JSON-LD enrich opt-in (run cron WITHOUT
+#              --phenom-enrich; work_mode/br_eligible resolved downstream
+#              by pre-apply-check).
+#
+# Excluded by design (premise broken per COTSK-11 STEAL 3 smoke):
+#   - Workable: 0/19 pharma slugs return jobs.
+#   - SmartRecruiters: 0/30 pharma slugs return jobs.
+#
+# Title/location filters mirror portals.yml as of 2026-05-23.
+
+# -- Title filter --
+
+title_filter:
+  positive:
+    - "Regulatory Affairs"
+    - "Regulatory Affairs Associate"
+    - "Regulatory Affairs Specialist"
+    - "Regulatory Associate"
+    - "Regulatory Coordinator"
+    - "Regulatory Manager"
+    - "Regulatory Lead"
+    - "Regulatory Strategy"
+    - "Regulatory Intelligence"
+    - "Regulatory Operations"
+    - "Assuntos Regulatórios"
+    - "Asuntos Regulatorios"
+    - "Analista Regulatório"
+    - "Analista Sênior Assuntos Regulatórios"
+    - "Analista Pleno Assuntos Regulatórios"
+    - "Especialista Assuntos Regulatórios"
+    - "Especialista Regulatório"
+    - "Coordenador Regulatório"
+    - "Gerente Regulatório"
+    - "Gerente de Assuntos Regulatórios"
+    - "Líder Regulatório"
+    - "Lifecycle Management"
+    - "Post-Approval"
+    - "Marketed Products Regulatory"
+    - "Regulatory Affairs — Established Products"
+    - "Labeling Regulatory"
+    - "Product Maintenance"
+    - "CMC Regulatory"
+    - "Horizon Scanning"
+  negative:
+    - "Quality Assurance"
+    - "Quality Control"
+    - "Clinical Research"
+    - "Clinical Operations"
+    - "Medical Affairs"
+    - "Pharmacovigilance"
+    - "Medical Writing"
+    - "Software"
+    - "Developer"
+    - "Engineer"
+    - "Data Scientist"
+    - "United States location"
+    - "Estados Unidos (location)"
+    - "USA-based"
+    - "remote US"
+    - "US remote"
+    - "remote USA"
+    - "(US)"
+    - "US-based"
+    - "Clinical Trial Submissions"
+    - "CTA Submissions"
+    - "DDCM"
+    - "DEEC"
+    - "Clinical Regulatory"
+    - "Study Start-Up"
+    - "IND Submissions"
+    - "CT Submissions"
+
+# -- Location filter --
+
+location_filter:
+  # Key MUST be `block:` (matches scan.mjs:165 buildLocationFilter). Earlier
+  # convention used `blocked_patterns:` which buildLocationFilter never read,
+  # silently rendering the filter inert. Fixed 2026-05-23 (COHO-21).
+  block:
+    - "United States"
+    - "Remote - US"
+    - "Remote, US"
+    - "Remote (US)"
+    - ", NY"
+    - ", CA"
+    - ", MA"
+    - ", NJ"
+    - ", PA"
+    - ", TX"
+    - ", IL"
+    - ", WA"
+    - "India"
+    - "Remote - India"
+    - "Hyderabad"
+    - "Japan"
+    - "Tokyo"
+    - "Osaka"
+    - "China"
+    - "Beijing"
+    - "Shanghai"
+    - "Hong Kong"
+    - "South Korea"
+    - "Seoul"
+    - "Taiwan"
+    - "Taipei"
+    - "Indonesia"
+    - "Jakarta"
+    - "Vietnam"
+    - "Australia"
+    - "Sydney"
+    - "Melbourne"
+    - "Singapore"
+    - "Thailand"
+    - "Egypt"
+    - "Cairo"
+    - "United Arab Emirates"
+    - "Dubai"
+    - "Canada"
+    - "Toronto"
+    - "Mexico"
+    - ", MD"
+    - ", NC"
+    - ", GA"
+    - ", VA"
+    - ", CO"
+    - ", MN"
+    - ", OH"
+    - ", CT"
+    - ", FL"
+    - ", AZ"
+
+# -- Tracked companies --
+
+tracked_companies:
+
+  # ─── Workday (9 tenants) ──────────────────────────────────────────────
+  # URLs constructed from portals.yml direct_portal_sources.workday[]
+  # (tenant.shard.myworkdayjobs.com/site) — schema validated against
+  # WORKDAY_HOST_REGEX in providers/workday.mjs.
+
+  - name: Pfizer (Workday)
+    careers_url: https://pfizer.wd1.myworkdayjobs.com/PfizerCareers
+    scan_method: provider
+    provider: workday
+    search_text: regulatory affairs
+    enabled: true
+
+  - name: Novartis (Workday)
+    careers_url: https://novartis.wd3.myworkdayjobs.com/Novartis_Careers
+    scan_method: provider
+    provider: workday
+    search_text: regulatory affairs
+    enabled: true
+
+  - name: Sanofi (Workday)
+    careers_url: https://sanofi.wd3.myworkdayjobs.com/SanofiCareers
+    scan_method: provider
+    provider: workday
+    search_text: regulatory affairs
+    enabled: true
+
+  - name: AstraZeneca (Workday)
+    careers_url: https://astrazeneca.wd3.myworkdayjobs.com/Careers
+    scan_method: provider
+    provider: workday
+    search_text: regulatory affairs
+    enabled: true
+
+  - name: Amgen (Workday)
+    careers_url: https://amgen.wd1.myworkdayjobs.com/Careers
+    scan_method: provider
+    provider: workday
+    search_text: regulatory affairs
+    enabled: true
+
+  - name: IQVIA (Workday)
+    careers_url: https://iqvia.wd1.myworkdayjobs.com/IQVIA
+    scan_method: provider
+    provider: workday
+    search_text: regulatory affairs
+    enabled: true
+
+  - name: Biogen (Workday)
+    careers_url: https://biibhr.wd3.myworkdayjobs.com/external
+    scan_method: provider
+    provider: workday
+    search_text: regulatory affairs
+    enabled: true
+
+  - name: Takeda (Workday)
+    careers_url: https://takeda.wd3.myworkdayjobs.com/External
+    scan_method: provider
+    provider: workday
+    search_text: regulatory affairs
+    enabled: true
+
+  - name: GSK (Workday)
+    careers_url: https://gsk.wd5.myworkdayjobs.com/GSKCareers
+    scan_method: provider
+    provider: workday
+    search_text: regulatory affairs
+    enabled: true
+
+  # ─── Gupy (5 BR pharma tenants) ───────────────────────────────────────
+  # PT-BR liveness regex fix applied (CP5). All 5 validated 2026-05-22
+  # with portal.api.gupy.io crawl + CP5 PT-BR revalidate.
+
+  - name: Brainfarma (Gupy)
+    careers_url: https://brainfarma.gupy.io
+    scan_method: provider
+    provider: gupy
+    search_text: regulat
+    enabled: true
+
+  - name: Eurofarma (Gupy)
+    careers_url: https://eurofarma.gupy.io
+    scan_method: provider
+    provider: gupy
+    search_text: regulat
+    enabled: true
+
+  - name: Hypera Pharma (Gupy)
+    careers_url: https://hyperapharma.gupy.io
+    scan_method: provider
+    provider: gupy
+    search_text: regulat
+    enabled: true
+
+  - name: Cristália Farmacêutica (Gupy)
+    careers_url: https://cristalia.gupy.io
+    scan_method: provider
+    provider: gupy
+    search_text: regulat
+    enabled: true
+
+  - name: MCassab Nutrição e Saúde Animal (Gupy)
+    careers_url: https://mcassabnutricaoesaudeanimal.gupy.io
+    scan_method: provider
+    provider: gupy
+    search_text: regulat
+    enabled: true
+
+  # ─── Phenom (2 tenants) ───────────────────────────────────────────────
+  # COTSK-11 STEAL 3 Sub-track A: scan-time JSON-LD enrich opt-in via
+  # `--phenom-enrich`. Cron runs WITHOUT the flag — Thermo/MSD jobs land
+  # with title+url only. work_mode/br_eligible resolved downstream by
+  # pre-apply-check at runtime.
+
+  - name: Thermo Fisher Scientific
+    careers_url: https://jobs.thermofisher.com/global/en
+    scan_method: provider
+    provider: phenom
+    search_text: regulatory
+    enabled: true
+
+  - name: MSD (Merck)
+    careers_url: https://jobs.merck.com
+    scan_method: provider
+    provider: phenom
+    search_text: regulatory
+    enabled: true

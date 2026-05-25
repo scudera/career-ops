@@ -29,11 +29,16 @@ function pass(msg) { console.log(`  ✅ ${msg}`); passed++; }
 function fail(msg) { console.log(`  ❌ ${msg}`); failed++; }
 function warn(msg) { console.log(`  ⚠️  ${msg}`); warnings++; }
 
-function run(cmd, args = [], opts = {}) {
+function runFile(cmd, args, opts = {}) {
   try {
-    if (Array.isArray(args) && args.length > 0) {
-      return execFileSync(cmd, args, { cwd: ROOT, encoding: 'utf-8', timeout: 30000, ...opts }).trim();
-    }
+    return execFileSync(cmd, args, { cwd: ROOT, encoding: 'utf-8', timeout: 30000, ...opts }).trim();
+  } catch (e) {
+    return null;
+  }
+}
+
+function runShell(cmd, opts = {}) {
+  try {
     return execSync(cmd, { cwd: ROOT, encoding: 'utf-8', timeout: 30000, ...opts }).trim();
   } catch (e) {
     return null;
@@ -51,7 +56,7 @@ console.log('1. Syntax checks');
 
 const mjsFiles = readdirSync(ROOT).filter(f => f.endsWith('.mjs'));
 for (const f of mjsFiles) {
-  const result = run(NODE, ['--check', f]);
+  const result = runFile(NODE, ['--check', f]);
   if (result !== null) {
     pass(`${f} syntax OK`);
   } else {
@@ -74,7 +79,7 @@ const scripts = [
 ];
 
 for (const { name, allowFail } of scripts) {
-  const result = run(NODE, name.split(' '), { stdio: ['pipe', 'pipe', 'pipe'] });
+  const result = runFile(NODE, name.split(' '), { stdio: ['pipe', 'pipe', 'pipe'] });
   if (result !== null) {
     pass(`${name} runs OK`);
   } else if (allowFail) {
@@ -143,7 +148,7 @@ try {
 
 if (!QUICK) {
   console.log('\n4. Dashboard build');
-  const goBuild = run('cd dashboard && go build -o /tmp/career-dashboard-test . 2>&1');
+  const goBuild = runFile('go', ['build', '-o', '/tmp/career-dashboard-test', '.'], { cwd: join(ROOT, 'dashboard') });
   if (goBuild !== null) {
     pass('Dashboard compiles');
   } else {
@@ -179,7 +184,7 @@ const userFiles = [
   'config/profile.yml', 'modes/_profile.md', 'portals.yml',
 ];
 for (const f of userFiles) {
-  const tracked = run('git', ['ls-files', f]);
+  const tracked = runFile('git', ['ls-files', f]);
   if (tracked === '') {
     pass(`User file gitignored: ${f}`);
   } else if (tracked === null) {
@@ -222,7 +227,7 @@ const grepPathspec = scanExtensions.map(e => `'*.${e}'`).join(' ');
 
 let leakFound = false;
 for (const pattern of leakPatterns) {
-  const result = run(
+  const result = runShell(
     `git grep -n "${pattern}" -- ${grepPathspec} 2>/dev/null`
   );
   if (result) {
@@ -245,7 +250,7 @@ console.log('\n7. Absolute path check');
 
 // Same git grep approach: only scans tracked files. Untracked AI tool
 // outputs, local debate artifacts, etc. can't false-positive here.
-const absPathResult = run(
+const absPathResult = runShell(
   `git grep -n "/Users/" -- '*.mjs' '*.sh' '*.md' '*.go' '*.yml' 2>/dev/null | grep -v README.md | grep -v LICENSE | grep -v CLAUDE.md | grep -v test-all.mjs`
 );
 if (!absPathResult) {

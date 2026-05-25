@@ -269,3 +269,71 @@ tracked_companies:
     provider: phenom
     search_text: regulatory
     enabled: true
+
+  # -- PharmiWeb RSS (validated 2026-05-25; global RA category, 52 jobs/snapshot) --
+  - name: PharmiWeb — Regulatory Affairs (global)
+    careers_url: https://www.pharmiweb.jobs/jobsrss/?Discipline=127
+    scan_method: provider
+    provider: rss
+    tier: 3
+    enabled: true
+
+  # -- Indeed BR (HTML scrape; Indeed deprecated RSS in 2024) --
+  # NOTE: local scan 2026-05-25 confirmed provider runs without crash but
+  # integration produced 0 net entries in pipeline.md (title filter aggression
+  # or URL canon issue). Provider stays enabled to keep producing telemetry
+  # for debug; sub-Manager filter is built-in via MANAGER_TITLE_RE.
+  - name: Indeed BR — RA Pharma Sao Paulo
+    careers_url: https://br.indeed.com/jobs
+    scan_method: provider
+    provider: indeed
+    tier: 4
+    search_text: "assuntos regulatorios farmaceutico"
+    location: "São Paulo, SP"
+    fromage: 7
+    limit: 25
+    enabled: true
+
+  - name: Indeed BR — RA Pharma Remote/Hibrido
+    careers_url: https://br.indeed.com/jobs
+    scan_method: provider
+    provider: indeed
+    tier: 4
+    search_text: "assuntos regulatorios remoto hibrido farmaceutico"
+    location: "Brasil"
+    fromage: 7
+    limit: 25
+    enabled: true
+
+  - name: Indeed BR — Analista AR Pleno-Senior
+    careers_url: https://br.indeed.com/jobs
+    scan_method: provider
+    provider: indeed
+    tier: 4
+    search_text: "analista assuntos regulatorios pleno senior"
+    location: "Brasil"
+    fromage: 14
+    limit: 25
+    enabled: true
+
+  - name: Indeed BR — Especialista Regulatory Affairs
+    careers_url: https://br.indeed.com/jobs
+    scan_method: provider
+    provider: indeed
+    tier: 4
+    search_text: "especialista regulatory affairs farmaceutico"
+    location: "Brasil"
+    fromage: 14
+    limit: 25
+    enabled: true
+
+  - name: Indeed BR — Regulatory Affairs English
+    careers_url: https://br.indeed.com/jobs
+    scan_method: provider
+    provider: indeed
+    tier: 4
+    search_text: "regulatory affairs pharmaceutical specialist"
+    location: "Brasil"
+    fromage: 14
+    limit: 20
+    enabled: true

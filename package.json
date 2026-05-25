@@ -18,7 +18,8 @@
     "patterns": "node analyze-patterns.mjs",
     "gemini:eval": "node gemini-eval.mjs",
     "dash:build": "cd dashboard && go build -o ../career-ops-dash .",
-    "dash": "node scripts/run-dash.mjs"
+    "dash": "node scripts/run-dash.mjs",
+    "next": "node scripts/next-action.mjs"
   },
   "keywords": [
     "ai",

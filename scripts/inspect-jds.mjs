@@ -110,8 +110,8 @@ async function main() {
   console.log('|---|---|---|---|---|---|');
   for (const r of results) {
     const marker = r.tier === 1 ? '🎯 1' : String(r.tier);
-    const ev = (r.evidence || '').replace(/\|/g, '\\|').replace(/\s+/g, ' ').slice(0, 200);
-    const loc = (r.location_real || '').replace(/\|/g, '\\|').slice(0, 60);
+    const ev = (r.evidence || '').replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\s+/g, ' ').slice(0, 200);
+    const loc = (r.location_real || '').replace(/\\/g, '\\\\').replace(/\|/g, '\\|').slice(0, 60);
     const url = r.url.length > 80 ? r.url.slice(0, 77) + '...' : r.url;
     console.log(`| ${marker} | ${r.work_mode} | ${r.br_eligible} | ${loc} | ${url} | ${ev} |`);
   }

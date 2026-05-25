@@ -86,7 +86,7 @@ const overall = passCount === results.length ? 'PASS' : 'FAIL';
 
 const ts = timestamp();
 const outPath = join(OUT_DIR, `cp5-fase-c-smoke-${ts}.md`);
-const esc = (s) => String(s || '').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ').slice(0, 200);
+const esc = (s) => String(s || '').replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ').slice(0, 200);
 
 const lines = [];
 lines.push(`# CP5 Fase C — Gupy re-validation post-liveness-fix (${ts})`);

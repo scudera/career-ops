@@ -155,7 +155,7 @@ async function main() {
   mkdirSync(OUT_DIR, { recursive: true });
 
   /** @param {string} s */
-  const esc = (s) => String(s || '').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ').slice(0, 200);
+  const esc = (s) => String(s || '').replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ').slice(0, 200);
 
   const lines = [];
   lines.push(`# Label Drift Report — ${ts}`);

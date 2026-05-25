@@ -134,10 +134,10 @@ for (let i = 0; i < synthetic.length; i++) {
   const truncated = formatted.length > 100 ? formatted.slice(0, 97) + '...' : formatted;
   if (failures.length === 0) {
     passCount++;
-    log(`| ${i + 1} | ${synthetic[i].name.replace(/\|/g, '\\|')} | \`${truncated.replace(/\|/g, '\\|')}\` | ✅ | all expectations match |`);
+    log(`| ${i + 1} | ${synthetic[i].name.replace(/\\/g, '\\\\').replace(/\|/g, '\\|')} | \`${truncated.replace(/\\/g, '\\\\').replace(/\|/g, '\\|')}\` | ✅ | all expectations match |`);
   } else {
     failCount++;
-    log(`| ${i + 1} | ${synthetic[i].name.replace(/\|/g, '\\|')} | \`${truncated.replace(/\|/g, '\\|')}\` | ❌ | ${failures.join('; ').replace(/\|/g, '\\|')} |`);
+    log(`| ${i + 1} | ${synthetic[i].name.replace(/\\/g, '\\\\').replace(/\|/g, '\\|')} | \`${truncated.replace(/\\/g, '\\\\').replace(/\|/g, '\\|')}\` | ❌ | ${failures.join('; ').replace(/\\/g, '\\\\').replace(/\|/g, '\\|')} |`);
   }
 }
 log(`\nPATH 1 verdict: ${passCount}/${synthetic.length} (${failCount} failed)\n`);

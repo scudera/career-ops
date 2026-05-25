@@ -152,7 +152,7 @@ async function main() {
   const ts = timestamp();
   const outPath = join(OUT_DIR, `cp4-fase-c-smoke-${ts}.md`);
   /** @param {string} s */
-  const esc = (s) => String(s || '').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ').slice(0, 200);
+  const esc = (s) => String(s || '').replace(/\\/g, '\\\\').replace(/\|/g, '\\|').replace(/\r?\n/g, ' ').slice(0, 200);
 
   const lines = [];
   lines.push(`# CP4 Fase C — End-to-End Smoke Test (${ts})`);

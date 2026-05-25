@@ -66,6 +66,9 @@ const notion = new Client({ auth: NOTION_TOKEN });
 
 const URL_REGEX = /^\*\*URL:\*\*\s+(https?:\/\/\S+)/m;
 const YAML_BLOCK_REGEX = /## Machine Summary\s*\n+```yaml\s*\n([\s\S]+?)\n```/;
+// Header fallback for older reports (pre-2026-05) that pre-date Machine
+// Summary: `**Score:** 2.8/5` or `**Score:** 2.8`. Tolerates whitespace.
+const HEADER_SCORE_REGEX = /^\*\*Score:\*\*\s+(\d+(?:\.\d+)?)\s*(?:\/\s*5)?/m;
 
 function parseReport(reportPath) {
   const text = readFileSync(reportPath, 'utf-8');
@@ -73,8 +76,10 @@ function parseReport(reportPath) {
   const urlMatch = text.match(URL_REGEX);
   const url = urlMatch ? urlMatch[1].trim() : null;
 
-  const yamlMatch = text.match(YAML_BLOCK_REGEX);
   let score = null;
+
+  // Preferred source: Machine Summary YAML block (newer reports).
+  const yamlMatch = text.match(YAML_BLOCK_REGEX);
   if (yamlMatch) {
     try {
       const parsed = yaml.load(yamlMatch[1]);
@@ -84,7 +89,16 @@ function parseReport(reportPath) {
         if (Number.isFinite(n)) score = n;
       }
     } catch (_err) {
-      // YAML parse failed — skip silently, will be reported as no-score below.
+      // YAML parse failed — fall through to header fallback.
+    }
+  }
+
+  // Fallback: header `**Score:** X.X/5` line.
+  if (score === null) {
+    const headerMatch = text.match(HEADER_SCORE_REGEX);
+    if (headerMatch) {
+      const n = parseFloat(headerMatch[1]);
+      if (Number.isFinite(n)) score = n;
     }
   }
 

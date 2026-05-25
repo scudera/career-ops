@@ -40,10 +40,6 @@ jobs:
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-        # Continues on failure: pipeline sync is the critical path; eval
-        # backfill is incremental polish. Don't break the cron over a
-        # missing report or transient 5xx.
-        continue-on-error: true
         run: node scripts/sync-evals-to-notion.mjs
 
       - name: Upload pipeline.md artifact (debug)

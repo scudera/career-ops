@@ -30,11 +30,21 @@ jobs:
           CAREER_OPS_PORTALS: portals.ci.yml
         run: npm run scan
 
-      - name: Sync to Notion
+      - name: Sync pipeline → Notion (new offers, INSERT-only)
         env:
           NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
         run: node scripts/sync-pipeline-to-notion.mjs
+
+      - name: Sync evals → Notion (Priority Score, UPDATE existing)
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+        # Continues on failure: pipeline sync is the critical path; eval
+        # backfill is incremental polish. Don't break the cron over a
+        # missing report or transient 5xx.
+        continue-on-error: true
+        run: node scripts/sync-evals-to-notion.mjs
 
       - name: Upload pipeline.md artifact (debug)
         if: always()

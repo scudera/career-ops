@@ -285,7 +285,8 @@ function formatPipelineLine(o) {
 function appendToPipeline(offers) {
   if (offers.length === 0) return;
 
-  let text = readFileSync(PIPELINE_PATH, 'utf-8');
+  // CI runs in fresh checkout — data/pipeline.md is gitignored, may not exist.
+  let text = existsSync(PIPELINE_PATH) ? readFileSync(PIPELINE_PATH, 'utf-8') : '';
 
   // Find "## Pendientes" section and append after it
   const marker = '## Pendientes';
@@ -543,7 +544,7 @@ async function main() {
         // Mark as seen to avoid intra-scan dupes
         seenUrls.add(job.url);
         seenCompanyRoles.add(key);
-        newOffers.push({ ...job, source: sourceName });
+        newOffers.push({ ...job, source: sourceName, tier: company.tier ?? job.tier });
       }
     } catch (err) {
       errors.push({ company: company.name, error: err.message });

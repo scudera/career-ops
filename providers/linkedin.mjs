@@ -88,7 +88,7 @@ export default {
         title: (r.position || '').trim(),
         url: r.jobUrl.split('?')[0], // strip tracking query params for stable dedup key
         company: (r.company || '').trim(),
-        location: (r.location || '').trim(),
+        location_real: (r.location || '').trim(),
         // v2 fields — LinkedIn search list doesn't expose these natively;
         // pre-apply-check resolves at triage time.
         work_mode: 'UNKNOWN',

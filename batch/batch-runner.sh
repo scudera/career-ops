@@ -250,6 +250,8 @@ next_report_num_unlocked() {
   if [[ -f "$STATE_FILE" ]]; then
     while IFS=$'\t' read -r _ _ _ _ _ rnum _ _ _; do
       [[ "$rnum" == "report_num" || "$rnum" == "-" || -z "$rnum" ]] && continue
+      # Defensive: state.tsv may have race-corrupted rows (decimals in rnum col)
+      [[ "$rnum" =~ ^[0-9]+$ ]] || continue
       local n=$((10#$rnum))
       if (( n > max_num )); then
         max_num=$n
@@ -387,9 +389,9 @@ process_offer() {
       score="$score_match"
     fi
 
-    # Check min-score gate
-    if [[ "$score" != "-" && -n "$score" ]] && (( $(echo "$MIN_SCORE > 0" | bc -l) )); then
-      if (( $(echo "$score < $MIN_SCORE" | bc -l) )); then
+    # Check min-score gate (awk used instead of bc — bc isn't installed on MINGW)
+    if [[ "$score" != "-" && -n "$score" ]] && (( $(awk -v m="$MIN_SCORE" 'BEGIN{print (m>0)?1:0}') )); then
+      if (( $(awk -v s="$score" -v m="$MIN_SCORE" 'BEGIN{print (s<m)?1:0}') )); then
         update_state "$id" "$url" "skipped" "$started_at" "$completed_at" "$report_num" "$score" "below-min-score" "$retries"
         echo "    ⏭️  Skipped (score: $score < min-score: $MIN_SCORE)"
         continue
@@ -436,7 +438,7 @@ print_summary() {
     case "$sstatus" in
       completed) completed=$((completed + 1))
         if [[ "$sscore" != "-" && -n "$sscore" ]]; then
-          score_sum=$(echo "$score_sum + $sscore" | bc 2>/dev/null || echo "$score_sum")
+          score_sum=$(awk -v a="$score_sum" -v b="$sscore" 'BEGIN{printf "%.2f", a+b}' 2>/dev/null || echo "$score_sum")
           score_count=$((score_count + 1))
         fi
         ;;
@@ -449,7 +451,7 @@ print_summary() {
 
   if (( score_count > 0 )); then
     local avg
-    avg=$(echo "scale=1; $score_sum / $score_count" | bc 2>/dev/null || echo "N/A")
+    avg=$(awk -v s="$score_sum" -v c="$score_count" 'BEGIN{printf "%.1f", s/c}' 2>/dev/null || echo "N/A")
     echo "Average score: $avg/5 ($score_count scored)"
   fi
 }

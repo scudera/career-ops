@@ -71,21 +71,18 @@ function parseApplications() {
   return rows;
 }
 
-function reportPath(num) {
-  // reports/{NNN}-*.md, pad num to 3 digits
-  const padded = num.padStart(3, '0');
-  try {
-    const files = readdirSync(REPORTS_DIR);
-    const match = files.find(f => f.startsWith(`${padded}-`) && f.endsWith('.md'));
-    return match ? join(REPORTS_DIR, match) : null;
-  } catch (_err) {
-    return null;
-  }
+// Extract report path from the reportLink markdown: [###](reports/path.md)
+function reportPathFromLink(reportLink) {
+  if (!reportLink) return null;
+  const m = reportLink.match(/\((reports\/[^)]+\.md)\)/);
+  return m ? m[1] : null;
 }
 
 function enrichFromReport(row) {
-  const p = reportPath(row.num);
-  if (!p) return row;
+  // Prefer the path embedded in applications.md reportLink (handles duplicates
+  // from batch race conditions where same num may map to multiple report files).
+  const p = reportPathFromLink(row.reportLink);
+  if (!p || !existsSync(p)) return row;
   const text = readFileSync(p, 'utf-8');
   const url = (text.match(URL_REGEX) || [])[1] || null;
   let archetype = null;
@@ -111,7 +108,9 @@ function daysBetween(a, b) {
 }
 
 function addWeeks(dateStr, weeks) {
+  if (!dateStr || typeof dateStr !== 'string') return null;
   const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return null;
   d.setDate(d.getDate() + weeks * 7);
   return d.toISOString().slice(0, 10);
 }
@@ -126,6 +125,7 @@ function ageLabel(postedAt, today) {
 }
 
 function deadlineLabel(deadlineDate, today) {
+  if (!deadlineDate) return 'data desconhecida';
   const d = daysBetween(today, deadlineDate);
   if (d < 0) return `EXPIRADA estimada há ${-d} dia${-d === 1 ? '' : 's'} — verifica liveness antes de aplicar`;
   if (d === 0) return 'EXPIRA HOJE (estimativa) — corre';

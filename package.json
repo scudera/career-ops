@@ -16,7 +16,9 @@
     "liveness": "node check-liveness.mjs",
     "scan": "node scan.mjs",
     "patterns": "node analyze-patterns.mjs",
-    "gemini:eval": "node gemini-eval.mjs"
+    "gemini:eval": "node gemini-eval.mjs",
+    "dash:build": "cd dashboard && go build -o ../career-ops-dash .",
+    "dash": "node scripts/run-dash.mjs"
   },
   "keywords": [
     "ai",

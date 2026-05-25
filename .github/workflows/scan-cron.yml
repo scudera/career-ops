@@ -36,11 +36,11 @@ jobs:
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
         run: node scripts/sync-pipeline-to-notion.mjs
 
-      - name: Sync evals → Notion (Priority Score, UPDATE existing)
-        env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
-          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
-        run: node scripts/sync-evals-to-notion.mjs
+      # NOTE: sync-evals-to-notion.mjs intentionally NOT wired here.
+      # reports/*.md is User Layer (gitignored), so CI checkout always has
+      # zero reports — the step would be a permanent no-op. Run it locally:
+      #   NOTION_TOKEN=... NOTION_DATABASE_ID=... node scripts/sync-evals-to-notion.mjs
+      # (use NODE_OPTIONS=--use-system-ca behind corp firewall).
 
       - name: Upload pipeline.md artifact (debug)
         if: always()

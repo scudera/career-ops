@@ -75,7 +75,7 @@ const notion = new Client(
 // like `<!-- DEAD: HTTP 410 -->` are stripped before parsing.
 
 const LINE_REGEX = /^- \[[ x]\]\s+(.+)$/;
-const HTML_COMMENT_REGEX = /<!--.*?-->\s*$/;
+const HTML_COMMENT_REGEX = /<!--[\s\S]*?-->\s*$/;
 
 // Parse a token block like "T=1 wm=REMOTE br=BR_OK loc=Remote BR" where
 // continuation words (no `=`) belong to the previous key's value. This

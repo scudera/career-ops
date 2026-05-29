@@ -512,6 +512,15 @@ try {
   fail(`always_allow tests crashed: ${e.message}`);
 }
 
+// ── 12. TITLE FILTER — word-boundary matching ───────────────────
+
+console.log('\n12. Title filter — word-boundary matching');
+{
+  const titleTest = runFile(NODE, ['test/test-title-filter.mjs'], { stdio: ['pipe', 'pipe', 'pipe'] });
+  if (titleTest !== null) pass('buildTitleFilter word-boundary tests pass');
+  else fail('buildTitleFilter word-boundary tests failed (run: node test/test-title-filter.mjs)');
+}
+
 // ── SUMMARY ─────────────────────────────────────────────────────
 
 console.log('\n' + '='.repeat(50));

@@ -273,6 +273,7 @@ Default modes are in `modes/` (English). Additional language-specific modes are 
 **This system is designed for quality, not quantity.** The goal is to help the user find and apply to roles where there is a genuine match -- not to spam companies with mass applications.
 
 - **User reviews before Submit BY DEFAULT, override per session if user explicitly authorizes.** Fill forms, draft answers, generate PDFs. Default: STOP before Submit and let user click. Override: when the user explicitly says "apply", "submeta", "manda" or equivalent for a specific vaga in the current session, you MAY proceed to Submit on their behalf — but log the action in `data/applications.md` notes column so the audit trail stays honest.
+  - **CDP apply automation (`src/apply/index.mjs`) enforces this in code:** a default run fills + uploads but does **not** submit; auto-submit requires the explicit `--auto-submit` flag (the only path that enables the countdown→click). Keeps política = código.
 - **Strongly discourage low-fit applications.** If a score is below 4.0/5, explicitly recommend against applying. The user's time and the recruiter's time are both valuable. Only proceed if the user has a specific reason to override the score.
 - **Quality over speed.** A well-targeted application to 5 companies beats a generic blast to 50. Guide the user toward fewer, better applications.
 - **Respect recruiters' time.** Every application a human reads costs someone's attention. Only send what's worth reading.

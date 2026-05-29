@@ -2,9 +2,10 @@
 /**
  * Countdown gate before final submit.
  *
- * Pauses N seconds, displays countdown in terminal. User can Ctrl-C
- * to abort. SAFETY GATE — if the user cannot focus the terminal in time,
- * the submission proceeds. Use with care.
+ * Reached ONLY on the --auto-submit path (see index.mjs; default runs never
+ * reach here). Pauses N seconds, displays countdown in terminal. User can
+ * Ctrl-C to abort. SAFETY GATE — if the user cannot focus the terminal in
+ * time, the submission proceeds. Use with care.
  *
  * @param {number} seconds — Countdown duration. 0 = no pause.
  */

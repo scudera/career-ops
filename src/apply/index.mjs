@@ -4,11 +4,12 @@
  *
  * Architectural NOTES (read before using):
  *
- * 1. AUTO-SUBMIT IS THE DEFAULT (--review-pause=5).
- *    Fill form → upload CV → 5-second countdown (Ctrl-C to abort) → click Submit
- *    → audit screenshot. Failure-to-abort is irreversible (applies to real
- *    employer's tracker). Use --dry-run to test against a new ATS without
- *    submitting.
+ * 1. SUBMIT IS OPT-IN — DEFAULT IS SAFE (no submit).
+ *    Default run fills form → uploads CV → STOPS before submit (browser stays
+ *    open for human review). Auto-submit requires the explicit --auto-submit
+ *    flag, the ONLY path that enables the countdown (Ctrl-C to abort) → click
+ *    Submit → audit screenshot. Failure-to-abort is irreversible (real
+ *    employer's tracker). --dry-run also skips submit (alias of the default).
  *
  * 2. Fresh browser, NOT user's Chrome.
  *    Launches chromium.launch({ headless: false }). No login cookies, no
@@ -28,6 +29,7 @@
  * @property {object} [profile] - Profile data (see mapProfileValue keys)
  * @property {number} [reviewPause=5] - Seconds to pause before submit
  * @property {boolean} [dryRun=false] - If true, fill+upload but skip submit
+ * @property {boolean} [autoSubmit=false] - If true (CLI: --auto-submit), proceed through countdown and click Submit. Default false = STOP before submit.
  * @property {string} [company='unknown'] - For audit screenshot filename
  * @property {string} [role='unknown'] - For audit screenshot filename
  */
@@ -59,6 +61,7 @@ export async function applyToJob(opts) {
     profile = {},
     reviewPause = 5,
     dryRun = false,
+    autoSubmit = false,
     company = 'unknown',
     role = 'unknown',
   } = opts;
@@ -95,13 +98,18 @@ export async function applyToJob(opts) {
       console.warn('CV upload skipped:', uploadResult.reason);
     }
 
-    if (dryRun) {
-      console.log('--dry-run: skipping submit. Browser stays open for inspection.');
-      console.log('Close browser manually when done.');
-      // Don't close browser in dry-run; let user inspect
+    // SAFETY GATE: submit only when explicitly authorized via --auto-submit
+    // (and never in --dry-run). Default (flag absent) fills + uploads, then
+    // STOPS before submit for human review. The countdown→click path below is
+    // unreachable without --auto-submit.
+    if (dryRun || !autoSubmit) {
+      const reason = dryRun ? '--dry-run' : 'default safe mode (no --auto-submit)';
+      console.log(`${reason}: skipping submit. Browser stays open for review.`);
+      console.log('Review the form and submit manually, or re-run with --auto-submit to auto-submit.');
       return {
         submitted: false,
-        dryRun: true,
+        autoSubmit: Boolean(autoSubmit),
+        dryRun: Boolean(dryRun),
         fillResult,
         uploadResult,
       };
@@ -165,17 +173,18 @@ if (isMain) {
   const reviewPauseArg = args.find((a) => a.startsWith('--review-pause='))?.slice(15);
   const reviewPause = reviewPauseArg !== undefined ? parseInt(reviewPauseArg, 10) : 5;
   const dryRun = args.includes('--dry-run');
+  const autoSubmit = args.includes('--auto-submit');
   const company = args.find((a) => a.startsWith('--company='))?.slice(10) || 'unknown';
   const role = args.find((a) => a.startsWith('--role='))?.slice(7) || 'unknown';
 
   if (!url || !cvPath) {
-    console.error('Usage: node src/apply/index.mjs <url> --cv=<path> [--review-pause=N] [--dry-run] [--company=X] [--role=Y]');
-    console.error('Defaults: --review-pause=5 (Ctrl-C to abort during countdown)');
+    console.error('Usage: node src/apply/index.mjs <url> --cv=<path> [--auto-submit] [--review-pause=N] [--dry-run] [--company=X] [--role=Y]');
+    console.error('Default is SAFE: without --auto-submit the form is filled but NOT submitted. --review-pause=5 applies only with --auto-submit (Ctrl-C to abort during countdown).');
     console.error('Profile: pass via API call only — CLI uses minimal env-var profile (not implemented).');
     process.exit(1);
   }
 
-  applyToJob({ url, cvPath, reviewPause, dryRun, company, role, profile: {} })
+  applyToJob({ url, cvPath, reviewPause, dryRun, autoSubmit, company, role, profile: {} })
     .then((r) => console.log('Done:', JSON.stringify(r, null, 2)))
     .catch((e) => {
       console.error(e);

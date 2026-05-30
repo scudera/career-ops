@@ -521,6 +521,15 @@ console.log('\n12. Title filter — word-boundary matching');
   else fail('buildTitleFilter word-boundary tests failed (run: node test/test-title-filter.mjs)');
 }
 
+// ── 13. TEAMTAILOR PROVIDER ─────────────────────────────────────
+
+console.log('\n13. Teamtailor provider — JSON Feed mapping');
+{
+  const ttTest = runFile(NODE, ['test/test-teamtailor.mjs'], { stdio: ['pipe', 'pipe', 'pipe'] });
+  if (ttTest !== null) pass('teamtailor provider tests pass');
+  else fail('teamtailor provider tests failed (run: node test/test-teamtailor.mjs)');
+}
+
 // ── SUMMARY ─────────────────────────────────────────────────────
 
 console.log('\n' + '='.repeat(50));

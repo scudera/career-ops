@@ -45,7 +45,9 @@ export const WORKDAY_REGISTRY = {
   takeda: {
     tenant: 'takeda',
     shard: 'wd3',
-    site: 'Takeda_External_Careers',
+    site: 'External',
+    verified_at: '2026-05-29',
+    verified_count: 259,
   },
   novartis: {
     tenant: 'novartis',
@@ -66,6 +68,70 @@ export const WORKDAY_REGISTRY = {
     tenant: 'beigene',
     shard: 'wd5',
     site: 'BeiGene',
+  },
+  // Pharma + CRO/CDMO tenants discovered + verified 2026-05-29 (COTSK Phase 3).
+  gilead: {
+    tenant: 'gilead',
+    shard: 'wd1',
+    site: 'GileadCareers',
+    verified_at: '2026-05-29',
+    verified_count: 67,
+  },
+  iqvia: {
+    tenant: 'iqvia',
+    shard: 'wd1',
+    site: 'IQVIA',
+    verified_at: '2026-05-29',
+    verified_count: 61,
+  },
+  icon: {
+    tenant: 'icon',
+    shard: 'wd3',
+    site: 'broadbean_external',
+    verified_at: '2026-05-29',
+    verified_count: 56,
+  },
+  parexel: {
+    tenant: 'parexel',
+    shard: 'wd1',
+    site: 'Parexel_External_Careers',
+    verified_at: '2026-05-29',
+    verified_count: 35,
+  },
+  elanco: {
+    tenant: 'elanco',
+    shard: 'wd5',
+    site: 'External_Career',
+    verified_at: '2026-05-29',
+    verified_count: 17,
+  },
+  lonza: {
+    tenant: 'lonza',
+    shard: 'wd3',
+    site: 'Lonza_Careers',
+    verified_at: '2026-05-29',
+    verified_count: 17,
+  },
+  fortrea: {
+    tenant: 'fortrea',
+    shard: 'wd1',
+    site: 'Fortrea',
+    verified_at: '2026-05-29',
+    verified_count: 10,
+  },
+  labcorp: {
+    tenant: 'labcorp',
+    shard: 'wd1',
+    site: 'External',
+    verified_at: '2026-05-29',
+    verified_count: 4,
+  },
+  catalent: {
+    tenant: 'catalent',
+    shard: 'wd1',
+    site: 'External',
+    verified_at: '2026-05-29',
+    verified_count: 2,
   },
 };
 

@@ -119,14 +119,27 @@ function resolveProvider(entry, providers, { skipIds = [] } = {}) {
 
 // ── Title filter ────────────────────────────────────────────────────
 
-function buildTitleFilter(titleFilter) {
-  const positive = (titleFilter?.positive || []).map(k => k.toLowerCase());
-  const negative = (titleFilter?.negative || []).map(k => k.toLowerCase());
+// Build a unicode-aware, word-boundary matcher for one keyword. Boundaries are
+// applied only at alphanumeric edges, so abbreviations match as whole tokens —
+// "RA Manager" hits "RA Manager, Oncology" but NOT "Camera Manager"/"Ultra Manager" —
+// while keywords with punctuation edges ("(US)", "Affairs — Established") still match.
+// Uses \p{L}\p{N} (not \b/\w, which are ASCII-only and would break "Regulatório").
+function keywordToRegex(keyword) {
+  const kw = String(keyword).toLowerCase().trim();
+  const escaped = kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const left = /^[\p{L}\p{N}]/u.test(kw) ? '(?<![\\p{L}\\p{N}])' : '';
+  const right = /[\p{L}\p{N}]$/u.test(kw) ? '(?![\\p{L}\\p{N}])' : '';
+  return new RegExp(left + escaped + right, 'iu');
+}
+
+export function buildTitleFilter(titleFilter) {
+  const positive = (titleFilter?.positive || []).map(keywordToRegex);
+  const negative = (titleFilter?.negative || []).map(keywordToRegex);
 
   return (title) => {
-    const lower = title.toLowerCase();
-    const hasPositive = positive.length === 0 || positive.some(k => lower.includes(k));
-    const hasNegative = negative.some(k => lower.includes(k));
+    const t = String(title);
+    const hasPositive = positive.length === 0 || positive.some(re => re.test(t));
+    const hasNegative = negative.some(re => re.test(t));
     return hasPositive && !hasNegative;
   };
 }

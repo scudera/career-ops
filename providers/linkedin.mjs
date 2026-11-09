@@ -30,7 +30,10 @@ import linkedIn from 'linkedin-jobs-api';
 const PROVIDER_ID = 'linkedin';
 const QUERY_TIMEOUT_MS = 30000;
 const DEFAULT_LIMIT = 25;
-const DEFAULT_DATE_SINCE = 'week'; // 'past month' | 'week' | '24hr'
+const DEFAULT_DATE_SINCE = 'week'; // 'month' | 'week' | '24hr'
+// linkedin-jobs-api only recognizes 'past month' | 'past week' | '24hr'; any
+// other value silently drops the f_TPR filter (returns all-time results).
+const DATE_ALIASES = { week: 'past week', month: 'past month', day: '24hr', '24h': '24hr' };
 
 /** @type {Provider} */
 export default {
@@ -53,7 +56,8 @@ export default {
   async fetch(entry, _ctx) {
     const keyword = entry.search_text || 'regulatory affairs';
     const location = entry.location || '';
-    const dateSincePosted = entry.date_since_posted || DEFAULT_DATE_SINCE;
+    const rawDate = String(entry.date_since_posted || DEFAULT_DATE_SINCE).toLowerCase();
+    const dateSincePosted = DATE_ALIASES[rawDate] || rawDate;
     const limit = String(entry.limit || DEFAULT_LIMIT);
 
     const queryOptions = {

@@ -1,8 +1,8 @@
 name: Daily Scan Cron
 
 on:
-  schedule:
-    - cron: '0 9 * * *'   # 9am UTC = 6am BRT
+  # Schedule disabled 2026-10-14: the daily scan now runs as a Claude routine
+  # (7:52 BRT, scan + Notion sync + evaluation). Manual trigger kept as fallback.
   workflow_dispatch:       # manual trigger via Actions tab
 
 jobs:
